@@ -2621,6 +2621,38 @@ function renderBotStatusPanel(dashboard) {
       stat: (scheduler && scheduler.jobs) ? scheduler.jobs.length : 0,
       statLabel: 'Jobs',
       lastActivity: dashboard ? dashboard.generated_at : null
+    },
+    {
+      name: 'Email Automation',
+      provider: 'Internal',
+      status: 'active',
+      stat: state.emailLogs.filter(e => e.template_type && e.template_type.startsWith('sequence_')).length,
+      statLabel: 'Seq. Emails',
+      lastActivity: null
+    },
+    {
+      name: 'Content Generator',
+      provider: 'OpenAI',
+      status: 'standby',
+      stat: '--',
+      statLabel: 'Posts',
+      lastActivity: null
+    },
+    {
+      name: 'Social Media Poster',
+      provider: 'Meta API',
+      status: 'standby',
+      stat: '--',
+      statLabel: 'Posts',
+      lastActivity: null
+    },
+    {
+      name: 'Instagram Lead Bot',
+      provider: 'Instagram DM',
+      status: 'standby',
+      stat: '--',
+      statLabel: 'DMs',
+      lastActivity: null
     }
   ];
 
@@ -3242,6 +3274,13 @@ async function loadBotsPage() {
   const [dashboard, health] = await Promise.all([loadDashboard(), loadHealth()]);
   await Promise.all([loadLeads(), loadEmailLog(), loadSmsSequences()]);
 
+  // Fetch bot status from API for live stats
+  let botsApiData = [];
+  try {
+    const botsResp = await apiFetch('/api/bots/status');
+    botsApiData = (botsResp && botsResp.bots) ? botsResp.bots : [];
+  } catch(e) { /* non-fatal */ }
+
   const scheduler = dashboard ? dashboard.scheduler : null;
 
   const bots = [
@@ -3297,13 +3336,65 @@ async function loadBotsPage() {
       name: 'Background Scheduler',
       provider: 'APScheduler',
       status: (scheduler && scheduler.running) ? 'active' : 'stopped',
-      desc: 'Runs periodic background jobs including SMS sequence processing, session cleanup, and appointment reminders on configured schedules.',
+      desc: 'Runs periodic background jobs including SMS sequence processing, email sequence processing, session cleanup, and appointment reminders on configured schedules.',
       stats: [
         { value: (scheduler && scheduler.jobs) ? scheduler.jobs.length : 0, label: 'Scheduled Jobs' },
         { value: scheduler && scheduler.running ? 1 : 0, label: 'Running' }
       ],
       lastActivity: dashboard ? dashboard.generated_at : null,
       jobs: (scheduler && scheduler.jobs) ? scheduler.jobs : []
+    },
+    {
+      name: 'Content Generator',
+      icon: 'edit-3',
+      provider: 'OpenAI / Internal',
+      status: 'standby',
+      desc: 'AI-powered blog and social media content generator. Produces weekly SEO blog posts, Google Ads copy, and Instagram captions aligned with the CrystalFlow content calendar.',
+      stats: [
+        { value: '--', label: 'Posts This Week' },
+        { value: '--', label: 'Next Scheduled' },
+        { value: '--', label: 'Approval Queue' }
+      ],
+      lastActivity: null
+    },
+    {
+      name: 'Social Media Poster',
+      icon: 'share-2',
+      provider: 'Facebook / Meta API',
+      status: 'standby',
+      desc: 'Schedules and publishes approved content to Facebook and Instagram. Manages post queue, monitors engagement, and syncs with the content calendar.',
+      stats: [
+        { value: '--', label: 'Posts This Month' },
+        { value: '--', label: 'Scheduled Queue' },
+        { value: '--', label: 'Last Post' }
+      ],
+      lastActivity: null
+    },
+    {
+      name: 'Instagram Lead Bot',
+      icon: 'message-circle',
+      provider: 'Instagram DM API',
+      status: 'standby',
+      desc: 'Handles incoming Instagram DMs from prospects. Qualifies leads, answers common questions, collects contact information, and routes hot leads for follow-up.',
+      stats: [
+        { value: '--', label: 'DMs Handled' },
+        { value: '--', label: 'Leads Captured' },
+        { value: '--', label: 'Conversion Rate' }
+      ],
+      lastActivity: null
+    },
+    {
+      name: 'Email Automation',
+      icon: 'zap',
+      provider: 'Internal',
+      status: 'active',
+      desc: 'Drip sequence: immediate welcome confirmation, Day 1 education (Miami water quality), Day 3 social proof, Day 7 limited-time installation offer.',
+      stats: [
+        { value: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? (b.stats.active_sequences || 0) : '--'; })(), label: 'Active Sequences' },
+        { value: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? (b.stats.emails_this_week || 0) : '--'; })(), label: 'Emails This Week' },
+        { value: '--', label: 'Open Rate' }
+      ],
+      lastActivity: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? b.last_activity : null; })()
     }
   ];
 
@@ -3432,6 +3523,14 @@ async function loadSettingsPage() {
       <div class="settings-row">
         <span class="settings-label">SMS Sequences</span>
         <span class="settings-value"><code>GET /api/sms/sequences</code></span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Email Automation</span>
+        <span class="settings-value"><code>GET /api/email/automation/sequences</code></span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Bot Status</span>
+        <span class="settings-value"><code>GET /api/bots/status</code></span>
       </div>
       <div class="settings-row">
         <span class="settings-label">Health</span>
