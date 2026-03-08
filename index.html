@@ -1,0 +1,3368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrystalFlow Miami — Admin Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ========================================
+   DESIGN TOKENS
+   ======================================== */
+:root {
+  /* Type Scale */
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.8125rem);
+  --text-sm:   clamp(0.8125rem, 0.78rem + 0.2vw, 0.875rem);
+  --text-base: clamp(0.875rem, 0.85rem + 0.15vw, 0.9375rem);
+  --text-lg:   clamp(1rem, 0.95rem + 0.3vw, 1.25rem);
+  --text-xl:   clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+  --text-2xl:  clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+
+  /* Spacing (4px system) */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Font families */
+  --font-display: 'Poppins', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Sidebar */
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 64px;
+  --header-height: 56px;
+}
+
+/* LIGHT THEME (default) */
+:root, [data-theme="light"] {
+  --color-bg: #F4F6F8;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F9FAFB;
+  --color-surface-hover: #F1F3F5;
+  --color-border: #E2E6EA;
+  --color-divider: #EBEEF1;
+
+  --color-text: #1A1D23;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #8993A4;
+  --color-text-faint: #B0B8C4;
+
+  --color-primary: #0066CC;
+  --color-primary-hover: #0052A3;
+  --color-primary-light: #E8F2FF;
+  --color-primary-text: #FFFFFF;
+
+  --color-teal: #00A5A8;
+  --color-teal-light: #E6F7F7;
+  --color-teal-dark: #008486;
+
+  --color-orange: #FF6B35;
+  --color-orange-light: #FFF0EB;
+  --color-orange-dark: #D4500F;
+
+  --color-success: #16A34A;
+  --color-success-light: #ECFDF5;
+  --color-error: #DC2626;
+  --color-error-light: #FEF2F2;
+  --color-warning: #EA580C;
+  --color-warning-light: #FFF7ED;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+/* DARK THEME */
+[data-theme="dark"] {
+  --color-bg: #111318;
+  --color-surface: #1A1D24;
+  --color-surface-2: #21252E;
+  --color-surface-hover: #282D38;
+  --color-border: #2E3440;
+  --color-divider: #252A33;
+
+  --color-text: #E2E5EB;
+  --color-text-secondary: #A0A8B8;
+  --color-text-muted: #6B7585;
+  --color-text-faint: #4A5260;
+
+  --color-primary: #4D9EFF;
+  --color-primary-hover: #3A8AEE;
+  --color-primary-light: #1A2A40;
+  --color-primary-text: #FFFFFF;
+
+  --color-teal: #2DD4BF;
+  --color-teal-light: #162A28;
+  --color-teal-dark: #14B8A6;
+
+  --color-orange: #FF8F6B;
+  --color-orange-light: #2A1E18;
+  --color-orange-dark: #FF6B35;
+
+  --color-success: #34D072;
+  --color-success-light: #162A1E;
+  --color-error: #F87171;
+  --color-error-light: #2A1818;
+  --color-warning: #FB923C;
+  --color-warning-light: #2A2018;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* ========================================
+   BASE RESET
+   ======================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+input, select, textarea { font: inherit; color: inherit; }
+table { border-collapse: collapse; width: 100%; }
+
+a, button, [role="button"], input, textarea, select {
+  transition: color var(--transition-fast),
+              background var(--transition-fast),
+              border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background: rgba(0, 102, 204, 0.2);
+  color: var(--color-text);
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+}
+
+/* ========================================
+   LAYOUT — DASHBOARD SHELL
+   ======================================== */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  height: 100dvh;
+  width: 100%;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+.sidebar {
+  grid-row: 1 / -1;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 30;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  height: var(--header-height);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sidebar-brand svg {
+  flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.sidebar-brand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.sidebar-brand-sub {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-3) var(--space-3);
+}
+
+.sidebar-section {
+  margin-bottom: var(--space-4);
+}
+
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  margin-bottom: 2px;
+  user-select: none;
+}
+
+.sidebar-link:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.sidebar-link.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.sidebar-link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.sidebar-link.active svg {
+  opacity: 1;
+}
+
+.sidebar-footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.sidebar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-user-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+.header {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  height: var(--header-height);
+  z-index: 20;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.header-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  position: relative;
+}
+
+.header-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.header-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+  border: 2px solid var(--color-surface);
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+.health-dot.offline {
+  background: var(--color-error);
+}
+
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+}
+
+.mobile-menu-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.mobile-menu-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+.main {
+  grid-column: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-6);
+  background: var(--color-bg);
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ========================================
+   CARDS & COMPONENTS
+   ======================================== */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.card-body {
+  padding: var(--space-5);
+}
+
+/* KPI Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.kpi-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.kpi-card.blue::before { background: var(--color-primary); }
+.kpi-card.red::before { background: var(--color-error); }
+.kpi-card.teal::before { background: var(--color-teal); }
+.kpi-card.orange::before { background: var(--color-orange); }
+
+.kpi-label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-trend.up { color: var(--color-success); }
+.kpi-trend.down { color: var(--color-error); }
+.kpi-trend.flat { color: var(--color-text-muted); }
+
+.kpi-trend svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+.badge-blue { background: var(--color-primary-light); color: var(--color-primary); }
+.badge-teal { background: var(--color-teal-light); color: var(--color-teal); }
+.badge-green { background: var(--color-success-light); color: var(--color-success); }
+.badge-green-bold { background: var(--color-success); color: #fff; }
+.badge-orange { background: var(--color-orange-light); color: var(--color-orange); }
+.badge-red { background: var(--color-error-light); color: var(--color-error); }
+.badge-purple { background: #F3E8FF; color: #7C3AED; }
+.badge-gray { background: var(--color-surface-hover); color: var(--color-text-muted); }
+
+[data-theme="dark"] .badge-purple { background: #2D1F4E; color: #A78BFA; }
+
+/* Score badges */
+.score-hot { background: var(--color-error-light); color: var(--color-error); font-weight: 700; }
+.score-warm { background: var(--color-orange-light); color: var(--color-orange); font-weight: 700; }
+.score-cold { background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; }
+
+/* Package badges */
+.pkg-kitchen_guard { background: var(--color-primary-light); color: var(--color-primary); }
+.pkg-home_shield { background: var(--color-teal-light); color: var(--color-teal); }
+.pkg-pure_life { background: var(--color-orange-light); color: var(--color-orange); }
+
+/* ========================================
+   TABLES
+   ======================================== */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  font-size: var(--text-sm);
+}
+
+.data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table th {
+  background: var(--color-surface-2);
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th:hover {
+  color: var(--color-text);
+}
+
+.data-table th .sort-icon {
+  display: inline-block;
+  margin-left: 4px;
+  opacity: 0.3;
+  font-size: 10px;
+}
+
+.data-table th.sorted .sort-icon {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.data-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table tbody tr {
+  cursor: pointer;
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+}
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+.btn-secondary:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-text-faint);
+}
+
+.btn-danger {
+  background: var(--color-error);
+  color: #fff;
+}
+.btn-danger:hover {
+  opacity: 0.9;
+}
+
+.btn-sm {
+  padding: 4px var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+.btn-ghost:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* ========================================
+   FORM ELEMENTS
+   ======================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  width: 100%;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0,102,204,0.12);
+}
+
+.form-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7585' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+.search-bar {
+  position: relative;
+}
+
+.search-bar input {
+  padding-left: 36px;
+}
+
+.search-bar svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.filter-row .search-bar {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-row .form-select {
+  width: auto;
+  min-width: 140px;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-base);
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(12px) scale(0.98);
+  transition: transform var(--transition-base);
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.modal-close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modal-body {
+  padding: var(--space-5);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-divider);
+}
+
+/* Large modal */
+.modal.modal-lg {
+  max-width: 720px;
+}
+
+/* ========================================
+   SLIDE PANEL (Lead Detail)
+   ======================================== */
+.slide-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-base);
+}
+
+.slide-panel-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.slide-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 480px;
+  max-width: 100%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  z-index: 91;
+  transform: translateX(100%);
+  transition: transform var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.slide-panel-overlay.open + .slide-panel,
+.slide-panel.open {
+  transform: translateX(0);
+}
+
+.slide-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.slide-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-5);
+}
+
+.slide-panel-footer {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-divider);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ========================================
+   PIPELINE FUNNEL
+   ======================================== */
+.funnel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.funnel-stage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.funnel-label {
+  width: 120px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.funnel-bar-wrap {
+  flex: 1;
+  height: 28px;
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+.funnel-bar {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--space-3);
+  min-width: 36px;
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.funnel-bar span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.funnel-bar.stage-new { background: var(--color-primary); }
+.funnel-bar.stage-contacted { background: var(--color-teal); }
+.funnel-bar.stage-qualified { background: var(--color-success); }
+.funnel-bar.stage-consultation { background: #7C3AED; }
+.funnel-bar.stage-quoted { background: var(--color-orange); }
+.funnel-bar.stage-won { background: #059669; }
+
+.funnel-count {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========================================
+   ACTIVITY FEED
+   ======================================== */
+.activity-feed {
+  list-style: none;
+  padding: 0;
+}
+
+.activity-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.activity-dot.lead { background: var(--color-primary); }
+.activity-dot.appointment { background: var(--color-teal); }
+.activity-dot.email { background: var(--color-orange); }
+.activity-dot.sms { background: #7C3AED; }
+.activity-dot.status { background: var(--color-success); }
+
+.activity-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.activity-text strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.activity-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========================================
+   APPOINTMENTS MINI LIST
+   ======================================== */
+.mini-list {
+  list-style: none;
+  padding: 0;
+}
+
+.mini-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.mini-item:last-child {
+  border-bottom: none;
+}
+
+.mini-time {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  width: 60px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mini-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-service {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+   DASHBOARD GRID
+   ======================================== */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.dash-grid .card-body {
+  max-height: 380px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ========================================
+   TABS
+   ======================================== */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-4);
+}
+
+.tab-btn {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+}
+
+.tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab-panel {
+  display: none;
+}
+.tab-panel.active {
+  display: block;
+}
+
+/* ========================================
+   SMS SEQUENCE EXPAND
+   ======================================== */
+.seq-row {
+  cursor: pointer;
+}
+
+.seq-steps {
+  display: none;
+  background: var(--color-surface-2);
+}
+
+.seq-steps.expanded {
+  display: table-row;
+}
+
+.seq-steps-inner {
+  padding: var(--space-3) var(--space-4);
+}
+
+.seq-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.seq-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.seq-step-num.sent { background: var(--color-success-light); color: var(--color-success); }
+.seq-step-num.pending { background: var(--color-surface-hover); color: var(--color-text-muted); }
+.seq-step-num.failed { background: var(--color-error-light); color: var(--color-error); }
+
+/* ========================================
+   SETTINGS PAGE
+   ======================================== */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.setting-value {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  text-align: right;
+  word-break: break-all;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.status-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.status-indicator.connected::before { background: var(--color-success); }
+.status-indicator.disconnected::before { background: var(--color-error); }
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+.toast-container {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border-left: 3px solid;
+  font-size: var(--text-sm);
+  max-width: 380px;
+  animation: toastIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast.success { border-left-color: var(--color-success); }
+.toast.error { border-left-color: var(--color-error); }
+.toast.info { border-left-color: var(--color-primary); }
+
+.toast.removing {
+  animation: toastOut 200ms ease-in forwards;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+/* ========================================
+   LOADING SPINNER
+   ======================================== */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+.spinner-lg {
+  width: 36px;
+  height: 36px;
+  border-width: 3px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-12);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-10);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state p {
+  font-size: var(--text-sm);
+}
+
+/* ========================================
+   LEAD DETAIL SECTIONS
+   ======================================== */
+.detail-section {
+  margin-bottom: var(--space-5);
+}
+
+.detail-section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-3);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+}
+
+.detail-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.detail-value {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.pipeline-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pipeline-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.pipeline-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pipeline-btn.current {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.timeline-list {
+  list-style: none;
+  padding: 0;
+  position: relative;
+}
+
+.timeline-list::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--color-divider);
+}
+
+.timeline-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  border: 2px solid var(--color-surface);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-event {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.timeline-date {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* ========================================
+   CALENDAR VIEW (Week)
+   ======================================== */
+.view-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.view-toggle-btn {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+}
+
+.view-toggle-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.view-toggle-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+
+.week-day {
+  background: var(--color-surface);
+  min-height: 120px;
+  padding: var(--space-2);
+}
+
+.week-day-header {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-divider);
+  margin-bottom: var(--space-2);
+}
+
+.week-day-header .day-num {
+  display: block;
+  font-size: var(--text-lg);
+  color: var(--color-text);
+  margin-top: 2px;
+}
+
+.week-day.today .week-day-header .day-num {
+  color: var(--color-primary);
+}
+
+.week-event {
+  padding: 4px 6px;
+  margin-bottom: 2px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.week-event.scheduled { background: var(--color-primary-light); color: var(--color-primary); }
+.week-event.confirmed { background: var(--color-success-light); color: var(--color-success); }
+.week-event.completed { background: var(--color-surface-hover); color: var(--color-text-muted); }
+.week-event.cancelled { background: var(--color-error-light); color: var(--color-error); }
+.week-event.no_show { background: var(--color-orange-light); color: var(--color-orange); }
+
+/* ========================================
+   FOOTER
+   ======================================== */
+.app-footer {
+  padding: var(--space-6) 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  margin-top: var(--space-8);
+}
+
+.app-footer a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+  .week-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    z-index: 50;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 40;
+  }
+
+  .mobile-overlay.visible {
+    display: block;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .header {
+    grid-column: 1;
+  }
+
+  .main {
+    grid-column: 1;
+    padding: var(--space-4);
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-row .form-select {
+    width: 100%;
+  }
+
+  .slide-panel {
+    width: 100%;
+  }
+
+  .week-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .week-day {
+    min-height: auto;
+  }
+
+  .funnel-label {
+    width: 80px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<!-- MOBILE OVERLAY -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <!-- CrystalFlow Logo SVG -->
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="CrystalFlow logo">
+        <rect width="32" height="32" rx="8" fill="#0066CC"/>
+        <path d="M16 6L22 12L16 18L10 12Z" fill="#fff" opacity="0.9"/>
+        <path d="M16 14L22 20L16 26L10 20Z" fill="#00A5A8" opacity="0.85"/>
+        <path d="M16 14L10 20L16 18L22 20Z" fill="#fff" opacity="0.3"/>
+      </svg>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-name">CrystalFlow</span>
+        <span class="sidebar-brand-sub">Miami</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-link active" data-page="dashboard" onclick="navigate('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a class="sidebar-link" data-page="leads" onclick="navigate('leads')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Leads
+        </a>
+        <a class="sidebar-link" data-page="appointments" onclick="navigate('appointments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Appointments
+        </a>
+        <a class="sidebar-link" data-page="messages" onclick="navigate('messages')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Messages
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">System</div>
+        <a class="sidebar-link" data-page="settings" onclick="navigate('settings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">IP</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Isaiah Pacheco</div>
+          <div class="sidebar-user-role">Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 class="header-title" id="pageTitle">Dashboard</h1>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <button class="header-btn" onclick="refreshData()" aria-label="Refresh data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      </button>
+      <div class="header-btn" style="cursor:default" aria-label="API health">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <div class="health-dot" id="healthDot"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="mainContent">
+    <!-- ===== DASHBOARD PAGE ===== -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card blue">
+          <span class="kpi-label">Total Leads</span>
+          <span class="kpi-value" id="kpiTotalLeads">--</span>
+          <span class="kpi-trend flat" id="kpiTotalLeadsTrend">Loading...</span>
+        </div>
+        <div class="kpi-card red">
+          <span class="kpi-label">Hot Leads</span>
+          <span class="kpi-value" id="kpiHotLeads">--</span>
+          <span class="kpi-trend flat" id="kpiHotLeadsTrend">--</span>
+        </div>
+        <div class="kpi-card teal">
+          <span class="kpi-label">Appointments This Week</span>
+          <span class="kpi-value" id="kpiAppointments">--</span>
+          <span class="kpi-trend flat" id="kpiAppointmentsTrend">--</span>
+        </div>
+        <div class="kpi-card orange">
+          <span class="kpi-label">Pipeline Value</span>
+          <span class="kpi-value" id="kpiPipeline">--</span>
+          <span class="kpi-trend flat" id="kpiPipelineTrend">--</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--space-4);">
+        <div class="card-header">
+          <span class="card-title">Lead Pipeline</span>
+        </div>
+        <div class="card-body">
+          <div class="funnel" id="funnelChart"></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Activity</span>
+          </div>
+          <div class="card-body">
+            <ul class="activity-feed" id="activityFeed">
+              <li class="loading-state"><div class="spinner"></div> Loading...</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Today's Appointments</span>
+          </div>
+          <div class="card-body">
+            <ul class="mini-list" id="todayAppointments">
+              <li class="loading-state"><div class="spinner"></div> Loading...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-footer">
+        <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+      </div>
+    </div>
+
+    <!-- ===== LEADS PAGE ===== -->
+    <div class="page" id="page-leads">
+      <div class="filter-row">
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="form-input" type="text" id="leadSearch" placeholder="Search leads..." oninput="debounceLeadSearch()">
+        </div>
+        <select class="form-select" id="filterStatus" onchange="filterLeads()">
+          <option value="">All Status</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="qualified">Qualified</option>
+          <option value="consultation_scheduled">Consultation</option>
+          <option value="quoted">Quoted</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+        <select class="form-select" id="filterScore" onchange="filterLeads()">
+          <option value="">All Scores</option>
+          <option value="hot">Hot</option>
+          <option value="warm">Warm</option>
+          <option value="cold">Cold</option>
+        </select>
+        <select class="form-select" id="filterSource" onchange="filterLeads()">
+          <option value="">All Sources</option>
+          <option value="website">Website</option>
+          <option value="referral">Referral</option>
+          <option value="google_ads">Google Ads</option>
+          <option value="facebook">Facebook</option>
+          <option value="yelp">Yelp</option>
+        </select>
+        <select class="form-select" id="filterPackage" onchange="filterLeads()">
+          <option value="">All Packages</option>
+          <option value="kitchen_guard">Kitchen Guard</option>
+          <option value="home_shield">Home Shield</option>
+          <option value="pure_life">Pure Life</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddLeadModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Lead
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table" id="leadsTable">
+            <thead>
+              <tr>
+                <th data-sort="name" onclick="sortLeads('name')">Name <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="email" onclick="sortLeads('email')">Email <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="phone" onclick="sortLeads('phone')">Phone <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="package_interest" onclick="sortLeads('package_interest')">Package <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="score" onclick="sortLeads('score')">Score <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="status" onclick="sortLeads('status')">Status <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="source" onclick="sortLeads('source')">Source <span class="sort-icon">&#9650;</span></th>
+                <th data-sort="created_at" onclick="sortLeads('created_at')">Created <span class="sort-icon">&#9650;</span></th>
+              </tr>
+            </thead>
+            <tbody id="leadsBody">
+              <tr><td colspan="8"><div class="loading-state"><div class="spinner"></div> Loading leads...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="app-footer">
+        <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+      </div>
+    </div>
+
+    <!-- ===== APPOINTMENTS PAGE ===== -->
+    <div class="page" id="page-appointments">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-3);">
+        <div class="view-toggle">
+          <button class="view-toggle-btn active" onclick="setApptView('calendar', this)">Calendar</button>
+          <button class="view-toggle-btn" onclick="setApptView('list', this)">List</button>
+        </div>
+        <button class="btn btn-primary" onclick="openBookApptModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Book Appointment
+        </button>
+      </div>
+
+      <div id="apptCalendarView">
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+
+      <div id="apptListView" style="display:none;">
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table" id="appointmentsTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="appointmentsBody">
+                <tr><td colspan="6"><div class="loading-state"><div class="spinner"></div> Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="app-footer">
+        <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+      </div>
+    </div>
+
+    <!-- ===== MESSAGES PAGE ===== -->
+    <div class="page" id="page-messages">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('email', this)">Email Log</button>
+        <button class="tab-btn" onclick="switchTab('sms', this)">SMS Sequences</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-email">
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table" id="emailTable">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Recipient</th>
+                  <th>Template</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="emailBody">
+                <tr><td colspan="5"><div class="loading-state"><div class="spinner"></div> Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-sms">
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table" id="smsTable">
+              <thead>
+                <tr>
+                  <th>Lead</th>
+                  <th>Sequence</th>
+                  <th>Current Step</th>
+                  <th>Next Send</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="smsBody">
+                <tr><td colspan="6"><div class="loading-state"><div class="spinner"></div> Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="app-footer">
+        <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS PAGE ===== -->
+    <div class="page" id="page-settings">
+      <div class="settings-grid" id="settingsGrid">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Business Info</span></div>
+          <div class="card-body" id="settingsBusiness">
+            <div class="setting-item"><span class="setting-label">Company</span><span class="setting-value">CrystalFlow Miami</span></div>
+            <div class="setting-item"><span class="setting-label">Owner</span><span class="setting-value">Isaiah Pacheco</span></div>
+            <div class="setting-item"><span class="setting-label">Email</span><span class="setting-value">isaiah.pacheco5321@gmail.com</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Email Provider</span></div>
+          <div class="card-body" id="settingsEmail">
+            <div class="setting-item"><span class="setting-label">Status</span><span class="setting-value"><span class="status-indicator connected">Connected</span></span></div>
+            <div class="setting-item"><span class="setting-label">Provider</span><span class="setting-value">Gmail SMTP</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">SMS Provider</span></div>
+          <div class="card-body" id="settingsSMS">
+            <div class="setting-item"><span class="setting-label">Status</span><span class="setting-value"><span class="status-indicator connected">Connected</span></span></div>
+            <div class="setting-item"><span class="setting-label">Provider</span><span class="setting-value">Twilio</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Business Hours</span></div>
+          <div class="card-body" id="settingsHours">
+            <div class="setting-item"><span class="setting-label">Mon - Fri</span><span class="setting-value">8:00 AM - 6:00 PM</span></div>
+            <div class="setting-item"><span class="setting-label">Saturday</span><span class="setting-value">9:00 AM - 2:00 PM</span></div>
+            <div class="setting-item"><span class="setting-label">Sunday</span><span class="setting-value">Closed</span></div>
+            <div class="setting-item"><span class="setting-label">Timezone</span><span class="setting-value">America/New_York (EST)</span></div>
+          </div>
+        </div>
+        <div class="card" style="grid-column: 1 / -1;">
+          <div class="card-header"><span class="card-title">API Endpoints</span></div>
+          <div class="card-body" id="settingsAPI">
+            <div class="setting-item"><span class="setting-label">Base URL</span><span class="setting-value" id="apiBaseDisplay">--</span></div>
+            <div class="setting-item"><span class="setting-label">Health</span><span class="setting-value">GET /api/health</span></div>
+            <div class="setting-item"><span class="setting-label">Dashboard</span><span class="setting-value">GET /api/dashboard</span></div>
+            <div class="setting-item"><span class="setting-label">Leads</span><span class="setting-value">GET/POST /api/leads</span></div>
+            <div class="setting-item"><span class="setting-label">Appointments</span><span class="setting-value">GET/POST /api/appointments</span></div>
+            <div class="setting-item"><span class="setting-label">Emails</span><span class="setting-value">GET/POST /api/email</span></div>
+            <div class="setting-item"><span class="setting-label">SMS</span><span class="setting-value">GET/POST /api/sms</span></div>
+            <div class="setting-item"><span class="setting-label">Webhooks</span><span class="setting-value">POST /api/webhooks/incoming</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="app-footer">
+        <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ===== LEAD DETAIL SLIDE PANEL ===== -->
+<div class="slide-panel-overlay" id="leadPanelOverlay" onclick="closeLeadPanel()"></div>
+<div class="slide-panel" id="leadPanel">
+  <div class="slide-panel-header">
+    <h3 class="modal-title" id="leadPanelName">Lead Detail</h3>
+    <button class="modal-close" onclick="closeLeadPanel()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="slide-panel-body" id="leadPanelBody">
+    <div class="loading-state"><div class="spinner"></div> Loading...</div>
+  </div>
+  <div class="slide-panel-footer" id="leadPanelFooter"></div>
+</div>
+
+<!-- ===== ADD LEAD MODAL ===== -->
+<div class="modal-overlay" id="addLeadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Add Lead</h3>
+      <button class="modal-close" onclick="closeModal('addLeadModal')" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="addLeadForm" onsubmit="return submitAddLead(event)">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+          <div class="form-group">
+            <label class="form-label">First Name *</label>
+            <input class="form-input" name="first_name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name *</label>
+            <input class="form-input" name="last_name" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input class="form-input" name="email" type="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-input" name="phone" type="tel">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+          <div class="form-group">
+            <label class="form-label">Package Interest</label>
+            <select class="form-select" name="package_interest">
+              <option value="">Select...</option>
+              <option value="kitchen_guard">Kitchen Guard</option>
+              <option value="home_shield">Home Shield</option>
+              <option value="pure_life">Pure Life</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Source</label>
+            <select class="form-select" name="source">
+              <option value="website">Website</option>
+              <option value="referral">Referral</option>
+              <option value="google_ads">Google Ads</option>
+              <option value="facebook">Facebook</option>
+              <option value="yelp">Yelp</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" name="notes" rows="3" placeholder="Initial notes..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addLeadModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('addLeadForm').requestSubmit()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BOOK APPOINTMENT MODAL ===== -->
+<div class="modal-overlay" id="bookApptModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Book Appointment</h3>
+      <button class="modal-close" onclick="closeModal('bookApptModal')" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="bookApptForm" onsubmit="return submitBookAppt(event)">
+        <div class="form-group">
+          <label class="form-label">Customer Name *</label>
+          <input class="form-input" name="customer_name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Customer Email *</label>
+          <input class="form-input" name="customer_email" type="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Customer Phone</label>
+          <input class="form-input" name="customer_phone" type="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service Type *</label>
+          <select class="form-select" name="service_type" required>
+            <option value="">Select...</option>
+            <option value="water_test">Water Test</option>
+            <option value="consultation">Consultation</option>
+            <option value="installation">Installation</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="repair">Repair</option>
+          </select>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-3);">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input class="form-input" name="date" type="date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time *</label>
+            <input class="form-input" name="time" type="time" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" name="notes" rows="2" placeholder="Special instructions..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('bookApptModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('bookApptForm').requestSubmit()">Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APPOINTMENT DETAIL MODAL ===== -->
+<div class="modal-overlay" id="apptDetailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Appointment Details</h3>
+      <button class="modal-close" onclick="closeModal('apptDetailModal')" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="apptDetailBody">
+      <div class="loading-state"><div class="spinner"></div></div>
+    </div>
+    <div class="modal-footer" id="apptDetailFooter"></div>
+  </div>
+</div>
+
+<!-- ===== SEND EMAIL MODAL ===== -->
+<div class="modal-overlay" id="sendEmailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Send Email</h3>
+      <button class="modal-close" onclick="closeModal('sendEmailModal')" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="sendEmailForm" onsubmit="return submitSendEmail(event)">
+        <input type="hidden" name="lead_id" id="emailLeadId">
+        <div class="form-group">
+          <label class="form-label">To</label>
+          <input class="form-input" id="emailTo" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Template *</label>
+          <select class="form-select" name="template_id" id="emailTemplateSelect" required>
+            <option value="">Loading templates...</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('sendEmailModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('sendEmailForm').requestSubmit()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ENROLL SMS MODAL ===== -->
+<div class="modal-overlay" id="enrollSmsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Enroll in SMS Sequence</h3>
+      <button class="modal-close" onclick="closeModal('enrollSmsModal')" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="enrollSmsForm" onsubmit="return submitEnrollSms(event)">
+        <input type="hidden" name="lead_id" id="smsLeadId">
+        <div class="form-group">
+          <label class="form-label">Lead</label>
+          <input class="form-input" id="smsLeadName" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sequence *</label>
+          <select class="form-select" name="sequence_type" required>
+            <option value="">Select...</option>
+            <option value="new_lead">New Lead Nurture</option>
+            <option value="follow_up">Follow Up</option>
+            <option value="post_consultation">Post Consultation</option>
+            <option value="reengagement">Re-engagement</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('enrollSmsModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('enrollSmsForm').requestSubmit()">Enroll</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========================================
+   CONFIGURATION
+   ======================================== */
+const API_BASE_URL = 'http://localhost:8000';
+
+/* ========================================
+   STATE
+   ======================================== */
+let currentPage = 'dashboard';
+let leads = [];
+let appointments = [];
+let emailLog = [];
+let smsSequences = [];
+let dashboardData = null;
+let emailTemplates = [];
+let leadSortCol = 'created_at';
+let leadSortDir = 'desc';
+let healthOk = false;
+let refreshInterval = null;
+let searchTimeout = null;
+
+/* ========================================
+   THEME
+   ======================================== */
+let currentTheme = 'light';
+
+function toggleTheme() {
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  const btn = document.getElementById('themeToggle');
+  if (currentTheme === 'dark') {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+}
+
+/* ========================================
+   ROUTING
+   ======================================== */
+const pageTitles = {
+  dashboard: 'Dashboard',
+  leads: 'Leads',
+  appointments: 'Appointments',
+  messages: 'Messages',
+  settings: 'Settings'
+};
+
+function navigate(page) {
+  currentPage = page;
+  window.location.hash = page;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  const link = document.querySelector('.sidebar-link[data-page="' + page + '"]');
+  if (link) link.classList.add('active');
+
+  document.getElementById('pageTitle').textContent = pageTitles[page] || 'Dashboard';
+
+  if (page === 'dashboard') loadDashboard();
+  else if (page === 'leads') loadLeads();
+  else if (page === 'appointments') loadAppointments();
+  else if (page === 'messages') loadMessages();
+  else if (page === 'settings') loadSettings();
+
+  closeMobileMenu();
+  document.getElementById('mainContent').scrollTop = 0;
+}
+
+function handleHashChange() {
+  const hash = window.location.hash.replace('#', '') || 'dashboard';
+  if (hash !== currentPage) navigate(hash);
+}
+
+window.addEventListener('hashchange', handleHashChange);
+
+/* ========================================
+   MOBILE MENU
+   ======================================== */
+function toggleMobileMenu() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('mobileOverlay');
+  sidebar.classList.toggle('mobile-open');
+  overlay.classList.toggle('visible');
+}
+
+function closeMobileMenu() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('mobileOverlay').classList.remove('visible');
+}
+
+/* ========================================
+   API HELPERS
+   ======================================== */
+async function apiFetch(path, options) {
+  const url = API_BASE_URL + path;
+  const defaults = {
+    headers: { 'Content-Type': 'application/json' },
+    mode: 'cors'
+  };
+  const config = { ...defaults, ...options };
+  if (options && options.headers) {
+    config.headers = { ...defaults.headers, ...options.headers };
+  }
+
+  try {
+    const response = await fetch(url, config);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || 'Request failed: ' + response.status);
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
+  } catch (err) {
+    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+      throw new Error('Cannot connect to API. Check that the server is running.');
+    }
+    throw err;
+  }
+}
+
+async function checkHealth() {
+  try {
+    await apiFetch('/api/health');
+    healthOk = true;
+    document.getElementById('healthDot').classList.remove('offline');
+  } catch (e) {
+    healthOk = false;
+    document.getElementById('healthDot').classList.add('offline');
+  }
+}
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+function showToast(message, type) {
+  type = type || 'info';
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  setTimeout(function() {
+    toast.classList.add('removing');
+    setTimeout(function() { toast.remove(); }, 200);
+  }, 3500);
+}
+
+/* ========================================
+   MODALS
+   ======================================== */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* ========================================
+   FORMAT HELPERS
+   ======================================== */
+function formatDate(dateStr) {
+  if (!dateStr) return '--';
+  var d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatTime(dateStr) {
+  if (!dateStr) return '--';
+  var d = new Date(dateStr);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function formatTimeOnly(timeStr) {
+  if (!timeStr) return '--';
+  if (timeStr.includes('T')) return formatTime(timeStr);
+  var parts = timeStr.split(':');
+  var h = parseInt(parts[0], 10);
+  var m = parts[1] || '00';
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return h + ':' + m + ' ' + ampm;
+}
+
+function formatRelative(dateStr) {
+  if (!dateStr) return '';
+  var d = new Date(dateStr);
+  var now = new Date();
+  var diff = (now - d) / 1000;
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+  return formatDate(dateStr);
+}
+
+function formatCurrency(val) {
+  if (val === null || val === undefined) return '--';
+  return '$' + Number(val).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function formatPhone(phone) {
+  if (!phone) return '--';
+  return phone;
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+function statusBadge(status) {
+  var map = {
+    new: 'badge-blue',
+    contacted: 'badge-teal',
+    qualified: 'badge-green',
+    consultation_scheduled: 'badge-purple',
+    quoted: 'badge-orange',
+    won: 'badge-green-bold',
+    lost: 'badge-gray'
+  };
+  return '<span class="badge ' + (map[status] || 'badge-gray') + '">' + capitalize(status) + '</span>';
+}
+
+function scoreBadge(score) {
+  var map = { hot: 'score-hot', warm: 'score-warm', cold: 'score-cold' };
+  return '<span class="badge ' + (map[score] || 'badge-gray') + '">' + capitalize(score) + '</span>';
+}
+
+function packageBadge(pkg) {
+  if (!pkg) return '--';
+  return '<span class="badge pkg-' + pkg + '">' + capitalize(pkg) + '</span>';
+}
+
+function apptStatusBadge(status) {
+  var map = {
+    scheduled: 'badge-blue',
+    confirmed: 'badge-green',
+    completed: 'badge-gray',
+    cancelled: 'badge-red',
+    no_show: 'badge-orange'
+  };
+  return '<span class="badge ' + (map[status] || 'badge-gray') + '">' + capitalize(status) + '</span>';
+}
+
+function emailStatusBadge(status) {
+  var map = { sent: 'badge-green', delivered: 'badge-green', opened: 'badge-blue', failed: 'badge-red', pending: 'badge-gray' };
+  return '<span class="badge ' + (map[status] || 'badge-gray') + '">' + capitalize(status) + '</span>';
+}
+
+/* ========================================
+   TREND ARROWS
+   ======================================== */
+function trendHTML(val, suffix) {
+  suffix = suffix || '';
+  if (val === undefined || val === null) return '';
+  var dir = val > 0 ? 'up' : val < 0 ? 'down' : 'flat';
+  var arrow = val > 0 ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>'
+    : val < 0 ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>'
+    : '';
+  return '<span class="kpi-trend ' + dir + '">' + arrow + Math.abs(val) + suffix + '</span>';
+}
+
+/* ========================================
+   DASHBOARD
+   ======================================== */
+async function loadDashboard() {
+  try {
+    var data = await apiFetch('/api/dashboard');
+    dashboardData = data;
+    renderDashboard(data);
+  } catch (e) {
+    renderDashboardFallback();
+  }
+}
+
+function renderDashboard(data) {
+  var kpis = data.kpis || data;
+
+  document.getElementById('kpiTotalLeads').textContent = kpis.total_leads !== undefined ? kpis.total_leads : '--';
+  document.getElementById('kpiTotalLeadsTrend').innerHTML = trendHTML(kpis.total_leads_trend, '%');
+
+  document.getElementById('kpiHotLeads').textContent = kpis.hot_leads !== undefined ? kpis.hot_leads : '--';
+  document.getElementById('kpiHotLeadsTrend').innerHTML = kpis.hot_leads_label || '';
+
+  document.getElementById('kpiAppointments').textContent = kpis.appointments_this_week !== undefined ? kpis.appointments_this_week : '--';
+  document.getElementById('kpiAppointmentsTrend').innerHTML = trendHTML(kpis.appointments_trend, '%');
+
+  document.getElementById('kpiPipeline').textContent = kpis.pipeline_value !== undefined ? formatCurrency(kpis.pipeline_value) : '--';
+  document.getElementById('kpiPipelineTrend').innerHTML = trendHTML(kpis.pipeline_trend, '%');
+
+  renderFunnel(data.pipeline || data.funnel || []);
+  renderActivityFeed(data.recent_activity || []);
+  renderTodayAppointments(data.today_appointments || []);
+}
+
+function renderDashboardFallback() {
+  document.getElementById('kpiTotalLeads').textContent = '--';
+  document.getElementById('kpiTotalLeadsTrend').innerHTML = '<span class="kpi-trend flat">API offline</span>';
+  document.getElementById('kpiHotLeads').textContent = '--';
+  document.getElementById('kpiHotLeadsTrend').textContent = '';
+  document.getElementById('kpiAppointments').textContent = '--';
+  document.getElementById('kpiAppointmentsTrend').textContent = '';
+  document.getElementById('kpiPipeline').textContent = '--';
+  document.getElementById('kpiPipelineTrend').textContent = '';
+  document.getElementById('funnelChart').innerHTML = '<div class="empty-state"><p>Cannot load pipeline data</p></div>';
+  document.getElementById('activityFeed').innerHTML = '<li class="empty-state"><p>Cannot load activity feed</p></li>';
+  document.getElementById('todayAppointments').innerHTML = '<li class="empty-state"><p>Cannot load appointments</p></li>';
+}
+
+function renderFunnel(pipeline) {
+  var stages = ['new', 'contacted', 'qualified', 'consultation_scheduled', 'quoted', 'won'];
+  var stageLabels = { new: 'New', contacted: 'Contacted', qualified: 'Qualified', consultation_scheduled: 'Consultation', quoted: 'Quoted', won: 'Won' };
+  var stageClasses = { new: 'stage-new', contacted: 'stage-contacted', qualified: 'stage-qualified', consultation_scheduled: 'stage-consultation', quoted: 'stage-quoted', won: 'stage-won' };
+
+  var stageCounts = {};
+  var maxCount = 1;
+
+  if (Array.isArray(pipeline)) {
+    pipeline.forEach(function(item) {
+      stageCounts[item.status || item.stage] = item.count || 0;
+    });
+  } else if (typeof pipeline === 'object') {
+    stageCounts = pipeline;
+  }
+
+  stages.forEach(function(s) {
+    if (!stageCounts[s]) stageCounts[s] = 0;
+    if (stageCounts[s] > maxCount) maxCount = stageCounts[s];
+  });
+
+  var html = '';
+  stages.forEach(function(s) {
+    var pct = Math.max(8, (stageCounts[s] / maxCount) * 100);
+    html += '<div class="funnel-stage">';
+    html += '<span class="funnel-label">' + stageLabels[s] + '</span>';
+    html += '<div class="funnel-bar-wrap"><div class="funnel-bar ' + stageClasses[s] + '" style="width:' + pct + '%"><span>' + stageCounts[s] + '</span></div></div>';
+    html += '</div>';
+  });
+  document.getElementById('funnelChart').innerHTML = html;
+}
+
+function renderActivityFeed(activities) {
+  var el = document.getElementById('activityFeed');
+  if (!activities || activities.length === 0) {
+    el.innerHTML = '<li class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>No recent activity</p></li>';
+    return;
+  }
+  var html = '';
+  activities.slice(0, 20).forEach(function(a) {
+    var dotType = a.type || 'lead';
+    html += '<li class="activity-item">';
+    html += '<div class="activity-dot ' + dotType + '"></div>';
+    html += '<div><div class="activity-text">' + (a.description || a.message || '') + '</div>';
+    html += '<div class="activity-time">' + formatRelative(a.timestamp || a.created_at) + '</div></div>';
+    html += '</li>';
+  });
+  el.innerHTML = html;
+}
+
+function renderTodayAppointments(appts) {
+  var el = document.getElementById('todayAppointments');
+  if (!appts || appts.length === 0) {
+    el.innerHTML = '<li class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><p>No appointments today</p></li>';
+    return;
+  }
+  var html = '';
+  appts.forEach(function(a) {
+    html += '<li class="mini-item">';
+    html += '<span class="mini-time">' + formatTimeOnly(a.time || a.start_time || a.datetime) + '</span>';
+    html += '<div class="mini-info"><div class="mini-name">' + (a.customer_name || a.name || '') + '</div>';
+    html += '<div class="mini-service">' + capitalize(a.service_type || a.type || '') + '</div></div>';
+    html += apptStatusBadge(a.status || 'scheduled');
+    html += '</li>';
+  });
+  el.innerHTML = html;
+}
+
+/* ========================================
+   LEADS
+   ======================================== */
+var debounceTimer = null;
+function debounceLeadSearch() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(filterLeads, 300);
+}
+
+async function loadLeads() {
+  try {
+    var params = buildLeadParams();
+    var data = await apiFetch('/api/leads' + params);
+    leads = Array.isArray(data) ? data : (data.leads || data.items || []);
+    renderLeadsTable();
+  } catch (e) {
+    document.getElementById('leadsBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>Cannot load leads. ' + escapeHtml(e.message) + '</p></div></td></tr>';
+  }
+}
+
+function buildLeadParams() {
+  var parts = [];
+  var search = document.getElementById('leadSearch').value.trim();
+  var status = document.getElementById('filterStatus').value;
+  var score = document.getElementById('filterScore').value;
+  var source = document.getElementById('filterSource').value;
+  var pkg = document.getElementById('filterPackage').value;
+  if (search) parts.push('search=' + encodeURIComponent(search));
+  if (status) parts.push('status=' + encodeURIComponent(status));
+  if (score) parts.push('score=' + encodeURIComponent(score));
+  if (source) parts.push('source=' + encodeURIComponent(source));
+  if (pkg) parts.push('package_interest=' + encodeURIComponent(pkg));
+  return parts.length ? '?' + parts.join('&') : '';
+}
+
+function filterLeads() {
+  loadLeads();
+}
+
+function sortLeads(col) {
+  if (leadSortCol === col) {
+    leadSortDir = leadSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    leadSortCol = col;
+    leadSortDir = 'asc';
+  }
+
+  document.querySelectorAll('#leadsTable th').forEach(function(th) {
+    th.classList.remove('sorted');
+    var si = th.querySelector('.sort-icon');
+    if (si) si.innerHTML = '&#9650;';
+  });
+
+  var th = document.querySelector('#leadsTable th[data-sort="' + col + '"]');
+  if (th) {
+    th.classList.add('sorted');
+    var si = th.querySelector('.sort-icon');
+    if (si) si.innerHTML = leadSortDir === 'asc' ? '&#9650;' : '&#9660;';
+  }
+
+  leads.sort(function(a, b) {
+    var va = a[col] || '';
+    var vb = b[col] || '';
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return leadSortDir === 'asc' ? -1 : 1;
+    if (va > vb) return leadSortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  renderLeadsTable();
+}
+
+function renderLeadsTable() {
+  var el = document.getElementById('leadsBody');
+  if (!leads.length) {
+    el.innerHTML = '<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No leads found</p></div></td></tr>';
+    return;
+  }
+  var html = '';
+  leads.forEach(function(lead) {
+    var name = (lead.first_name || '') + ' ' + (lead.last_name || '');
+    if (name.trim() === '') name = lead.name || 'Unknown';
+    html += '<tr onclick="openLeadDetail(\'' + lead.id + '\')">';
+    html += '<td style="font-weight:600;color:var(--color-text)">' + escapeHtml(name.trim()) + '</td>';
+    html += '<td>' + escapeHtml(lead.email || '--') + '</td>';
+    html += '<td>' + escapeHtml(formatPhone(lead.phone)) + '</td>';
+    html += '<td>' + packageBadge(lead.package_interest) + '</td>';
+    html += '<td>' + scoreBadge(lead.score) + '</td>';
+    html += '<td>' + statusBadge(lead.status) + '</td>';
+    html += '<td>' + capitalize(lead.source || '--') + '</td>';
+    html += '<td>' + formatDate(lead.created_at) + '</td>';
+    html += '</tr>';
+  });
+  el.innerHTML = html;
+}
+
+/* ========================================
+   LEAD DETAIL PANEL
+   ======================================== */
+async function openLeadDetail(id) {
+  var overlay = document.getElementById('leadPanelOverlay');
+  var panel = document.getElementById('leadPanel');
+  overlay.classList.add('open');
+  panel.classList.add('open');
+  document.getElementById('leadPanelBody').innerHTML = '<div class="loading-state"><div class="spinner"></div> Loading...</div>';
+  document.getElementById('leadPanelFooter').innerHTML = '';
+
+  try {
+    var lead = await apiFetch('/api/leads/' + id);
+    renderLeadDetail(lead);
+  } catch (e) {
+    document.getElementById('leadPanelBody').innerHTML = '<div class="empty-state"><p>' + escapeHtml(e.message) + '</p></div>';
+  }
+}
+
+function renderLeadDetail(lead) {
+  var name = (lead.first_name || '') + ' ' + (lead.last_name || '');
+  if (name.trim() === '') name = lead.name || 'Unknown';
+  document.getElementById('leadPanelName').textContent = name.trim();
+
+  var stages = ['new', 'contacted', 'qualified', 'consultation_scheduled', 'quoted', 'won', 'lost'];
+
+  var html = '';
+  // Info section
+  html += '<div class="detail-section">';
+  html += '<div class="detail-section-title">Contact Info</div>';
+  html += '<div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">' + escapeHtml(lead.email || '--') + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">' + escapeHtml(formatPhone(lead.phone)) + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Source</span><span class="detail-value">' + capitalize(lead.source || '--') + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Package</span><span class="detail-value">' + packageBadge(lead.package_interest) + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Score</span><span class="detail-value">' + scoreBadge(lead.score) + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Created</span><span class="detail-value">' + formatDate(lead.created_at) + '</span></div>';
+  html += '</div>';
+
+  // Pipeline status
+  html += '<div class="detail-section">';
+  html += '<div class="detail-section-title">Pipeline Status</div>';
+  html += '<div class="pipeline-btns">';
+  stages.forEach(function(s) {
+    var isCurrent = lead.status === s;
+    html += '<button class="pipeline-btn ' + (isCurrent ? 'current' : '') + '" onclick="changeLeadStatus(\'' + lead.id + '\', \'' + s + '\')">' + capitalize(s) + '</button>';
+  });
+  html += '</div></div>';
+
+  // Notes
+  html += '<div class="detail-section">';
+  html += '<div class="detail-section-title">Notes</div>';
+  html += '<textarea class="form-textarea" id="leadNotes" placeholder="Add notes...">' + escapeHtml(lead.notes || '') + '</textarea>';
+  html += '<button class="btn btn-sm btn-secondary" style="margin-top:var(--space-2)" onclick="saveLeadNotes(\'' + lead.id + '\')">Save Notes</button>';
+  html += '</div>';
+
+  // Activity timeline
+  html += '<div class="detail-section">';
+  html += '<div class="detail-section-title">Activity Timeline</div>';
+  var events = lead.lifecycle_events || lead.activity || [];
+  if (events.length) {
+    html += '<ul class="timeline-list">';
+    events.forEach(function(ev) {
+      html += '<li class="timeline-item"><div class="timeline-dot"></div><div class="timeline-content">';
+      html += '<div class="timeline-event">' + escapeHtml(ev.description || ev.event || ev.message || '') + '</div>';
+      html += '<div class="timeline-date">' + formatRelative(ev.timestamp || ev.created_at || ev.date) + '</div>';
+      html += '</div></li>';
+    });
+    html += '</ul>';
+  } else {
+    html += '<p style="font-size:var(--text-sm);color:var(--color-text-muted)">No activity yet</p>';
+  }
+  html += '</div>';
+
+  document.getElementById('leadPanelBody').innerHTML = html;
+
+  // Footer actions
+  var footer = '';
+  footer += '<button class="btn btn-sm btn-primary" onclick="openSendEmailForLead(\'' + lead.id + '\', \'' + escapeHtml(lead.email || '') + '\')">Send Email</button>';
+  footer += '<button class="btn btn-sm btn-secondary" onclick="openEnrollSmsForLead(\'' + lead.id + '\', \'' + escapeHtml(name.trim()) + '\')">Enroll SMS</button>';
+  footer += '<button class="btn btn-sm btn-secondary" onclick="bookApptForLead(\'' + escapeHtml(name.trim()) + '\', \'' + escapeHtml(lead.email || '') + '\', \'' + escapeHtml(lead.phone || '') + '\')">Book Appointment</button>';
+  document.getElementById('leadPanelFooter').innerHTML = footer;
+}
+
+function closeLeadPanel() {
+  document.getElementById('leadPanelOverlay').classList.remove('open');
+  document.getElementById('leadPanel').classList.remove('open');
+}
+
+async function changeLeadStatus(id, status) {
+  try {
+    await apiFetch('/api/leads/' + id + '/status', {
+      method: 'PUT',
+      body: JSON.stringify({ status: status })
+    });
+    showToast('Status updated to ' + capitalize(status), 'success');
+    openLeadDetail(id);
+    loadLeads();
+  } catch (e) {
+    showToast('Failed to update status: ' + e.message, 'error');
+  }
+}
+
+async function saveLeadNotes(id) {
+  var notes = document.getElementById('leadNotes').value;
+  try {
+    await apiFetch('/api/leads/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({ notes: notes })
+    });
+    showToast('Notes saved', 'success');
+  } catch (e) {
+    showToast('Failed to save notes: ' + e.message, 'error');
+  }
+}
+
+/* ========================================
+   ADD LEAD
+   ======================================== */
+function openAddLeadModal() {
+  document.getElementById('addLeadForm').reset();
+  openModal('addLeadModal');
+}
+
+async function submitAddLead(e) {
+  e.preventDefault();
+  var form = document.getElementById('addLeadForm');
+  var fd = new FormData(form);
+  var data = {};
+  fd.forEach(function(v, k) { if (v) data[k] = v; });
+
+  try {
+    await apiFetch('/api/leads', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    showToast('Lead created', 'success');
+    closeModal('addLeadModal');
+    loadLeads();
+  } catch (e2) {
+    showToast('Failed to create lead: ' + e2.message, 'error');
+  }
+  return false;
+}
+
+/* ========================================
+   SEND EMAIL FROM LEAD
+   ======================================== */
+function openSendEmailForLead(leadId, email) {
+  document.getElementById('emailLeadId').value = leadId;
+  document.getElementById('emailTo').value = email;
+  loadEmailTemplates();
+  openModal('sendEmailModal');
+}
+
+async function loadEmailTemplates() {
+  try {
+    var data = await apiFetch('/api/email/templates');
+    emailTemplates = Array.isArray(data) ? data : (data.templates || []);
+    var sel = document.getElementById('emailTemplateSelect');
+    sel.innerHTML = '<option value="">Select template...</option>';
+    emailTemplates.forEach(function(t) {
+      sel.innerHTML += '<option value="' + t.id + '">' + escapeHtml(t.name || t.subject || t.id) + '</option>';
+    });
+  } catch (e) {
+    document.getElementById('emailTemplateSelect').innerHTML = '<option value="">No templates available</option>';
+  }
+}
+
+async function submitSendEmail(e) {
+  e.preventDefault();
+  var leadId = document.getElementById('emailLeadId').value;
+  var templateId = document.getElementById('emailTemplateSelect').value;
+  if (!templateId) { showToast('Select a template', 'error'); return false; }
+
+  try {
+    await apiFetch('/api/email/send', {
+      method: 'POST',
+      body: JSON.stringify({ lead_id: leadId, template_id: templateId })
+    });
+    showToast('Email sent', 'success');
+    closeModal('sendEmailModal');
+  } catch (e2) {
+    showToast('Failed to send: ' + e2.message, 'error');
+  }
+  return false;
+}
+
+/* ========================================
+   ENROLL SMS FROM LEAD
+   ======================================== */
+function openEnrollSmsForLead(leadId, name) {
+  document.getElementById('smsLeadId').value = leadId;
+  document.getElementById('smsLeadName').value = name;
+  document.getElementById('enrollSmsForm').querySelector('[name="sequence_type"]').value = '';
+  openModal('enrollSmsModal');
+}
+
+async function submitEnrollSms(e) {
+  e.preventDefault();
+  var form = document.getElementById('enrollSmsForm');
+  var fd = new FormData(form);
+  var data = {};
+  fd.forEach(function(v, k) { data[k] = v; });
+
+  try {
+    await apiFetch('/api/sms/enroll', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    showToast('Enrolled in SMS sequence', 'success');
+    closeModal('enrollSmsModal');
+  } catch (e2) {
+    showToast('Failed to enroll: ' + e2.message, 'error');
+  }
+  return false;
+}
+
+/* ========================================
+   BOOK APPOINTMENT FOR LEAD
+   ======================================== */
+function bookApptForLead(name, email, phone) {
+  document.getElementById('bookApptForm').reset();
+  var form = document.getElementById('bookApptForm');
+  form.querySelector('[name="customer_name"]').value = name;
+  form.querySelector('[name="customer_email"]').value = email;
+  form.querySelector('[name="customer_phone"]').value = phone || '';
+  closeLeadPanel();
+  openModal('bookApptModal');
+}
+
+/* ========================================
+   APPOINTMENTS
+   ======================================== */
+async function loadAppointments() {
+  try {
+    var data = await apiFetch('/api/appointments');
+    appointments = Array.isArray(data) ? data : (data.appointments || data.items || []);
+    renderWeekView();
+    renderApptList();
+  } catch (e) {
+    appointments = [];
+    renderWeekView();
+    document.getElementById('appointmentsBody').innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>' + escapeHtml(e.message) + '</p></div></td></tr>';
+  }
+}
+
+function setApptView(view, btn) {
+  document.querySelectorAll('.view-toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  if (view === 'calendar') {
+    document.getElementById('apptCalendarView').style.display = 'block';
+    document.getElementById('apptListView').style.display = 'none';
+  } else {
+    document.getElementById('apptCalendarView').style.display = 'none';
+    document.getElementById('apptListView').style.display = 'block';
+  }
+}
+
+function renderWeekView() {
+  var today = new Date();
+  var dayOfWeek = today.getDay();
+  var startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - dayOfWeek);
+
+  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var html = '';
+
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    var isToday = d.toDateString() === today.toDateString();
+    var dateStr = d.toISOString().split('T')[0];
+
+    html += '<div class="week-day ' + (isToday ? 'today' : '') + '">';
+    html += '<div class="week-day-header">' + days[i] + '<span class="day-num">' + d.getDate() + '</span></div>';
+
+    var dayAppts = appointments.filter(function(a) {
+      var aDate = (a.date || a.datetime || '').split('T')[0];
+      return aDate === dateStr;
+    });
+
+    dayAppts.forEach(function(a) {
+      var time = formatTimeOnly(a.time || a.start_time || a.datetime);
+      html += '<div class="week-event ' + (a.status || 'scheduled') + '" onclick="openApptDetail(\'' + a.id + '\')" title="' + escapeHtml(a.customer_name || '') + '">';
+      html += time + ' ' + escapeHtml(a.customer_name || a.name || '');
+      html += '</div>';
+    });
+
+    html += '</div>';
+  }
+
+  document.getElementById('weekGrid').innerHTML = html;
+}
+
+function renderApptList() {
+  var el = document.getElementById('appointmentsBody');
+  if (!appointments.length) {
+    el.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><p>No appointments</p></div></td></tr>';
+    return;
+  }
+  var html = '';
+  appointments.forEach(function(a) {
+    html += '<tr onclick="openApptDetail(\'' + a.id + '\')">';
+    html += '<td>' + formatDate(a.date || a.datetime) + '</td>';
+    html += '<td>' + formatTimeOnly(a.time || a.start_time || a.datetime) + '</td>';
+    html += '<td style="font-weight:600">' + escapeHtml(a.customer_name || a.name || '--') + '</td>';
+    html += '<td>' + capitalize(a.service_type || a.type || '--') + '</td>';
+    html += '<td>' + apptStatusBadge(a.status) + '</td>';
+    html += '<td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openApptDetail(\'' + a.id + '\')">View</button></td>';
+    html += '</tr>';
+  });
+  el.innerHTML = html;
+}
+
+function openBookApptModal() {
+  document.getElementById('bookApptForm').reset();
+  openModal('bookApptModal');
+}
+
+async function submitBookAppt(e) {
+  e.preventDefault();
+  var form = document.getElementById('bookApptForm');
+  var fd = new FormData(form);
+  var data = {};
+  fd.forEach(function(v, k) { if (v) data[k] = v; });
+
+  try {
+    await apiFetch('/api/appointments/book', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    showToast('Appointment booked', 'success');
+    closeModal('bookApptModal');
+    loadAppointments();
+  } catch (e2) {
+    showToast('Failed to book: ' + e2.message, 'error');
+  }
+  return false;
+}
+
+function openApptDetail(id) {
+  var appt = appointments.find(function(a) { return a.id === id || String(a.id) === String(id); });
+  if (!appt) { showToast('Appointment not found', 'error'); return; }
+
+  var body = '';
+  body += '<div class="detail-row"><span class="detail-label">Customer</span><span class="detail-value" style="font-weight:600">' + escapeHtml(appt.customer_name || appt.name || '--') + '</span></div>';
+  body += '<div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">' + escapeHtml(appt.customer_email || appt.email || '--') + '</span></div>';
+  body += '<div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">' + escapeHtml(appt.customer_phone || appt.phone || '--') + '</span></div>';
+  body += '<div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">' + capitalize(appt.service_type || appt.type || '--') + '</span></div>';
+  body += '<div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">' + formatDate(appt.date || appt.datetime) + '</span></div>';
+  body += '<div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">' + formatTimeOnly(appt.time || appt.start_time || appt.datetime) + '</span></div>';
+  body += '<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">' + apptStatusBadge(appt.status) + '</span></div>';
+  if (appt.notes) {
+    body += '<div style="margin-top:var(--space-4)"><span class="detail-label">Notes</span><p style="margin-top:var(--space-2);font-size:var(--text-sm);color:var(--color-text-secondary)">' + escapeHtml(appt.notes) + '</p></div>';
+  }
+  document.getElementById('apptDetailBody').innerHTML = body;
+
+  var footer = '';
+  if (appt.status === 'scheduled') {
+    footer += '<button class="btn btn-sm btn-primary" onclick="confirmAppt(\'' + id + '\')">Confirm</button>';
+    footer += '<button class="btn btn-sm btn-secondary" onclick="rescheduleAppt(\'' + id + '\')">Reschedule</button>';
+    footer += '<button class="btn btn-sm btn-danger" onclick="cancelAppt(\'' + id + '\')">Cancel</button>';
+  } else if (appt.status === 'confirmed') {
+    footer += '<button class="btn btn-sm btn-secondary" onclick="rescheduleAppt(\'' + id + '\')">Reschedule</button>';
+    footer += '<button class="btn btn-sm btn-danger" onclick="cancelAppt(\'' + id + '\')">Cancel</button>';
+  }
+  footer += '<button class="btn btn-sm btn-ghost" onclick="closeModal(\'apptDetailModal\')">Close</button>';
+  document.getElementById('apptDetailFooter').innerHTML = footer;
+
+  openModal('apptDetailModal');
+}
+
+async function confirmAppt(id) {
+  try {
+    await apiFetch('/api/appointments/' + id + '/confirm', { method: 'PUT' });
+    showToast('Appointment confirmed', 'success');
+    closeModal('apptDetailModal');
+    loadAppointments();
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error');
+  }
+}
+
+async function rescheduleAppt(id) {
+  var newDate = prompt('New date (YYYY-MM-DD):');
+  var newTime = prompt('New time (HH:MM):');
+  if (!newDate || !newTime) return;
+  try {
+    await apiFetch('/api/appointments/' + id + '/reschedule', {
+      method: 'PUT',
+      body: JSON.stringify({ date: newDate, time: newTime })
+    });
+    showToast('Appointment rescheduled', 'success');
+    closeModal('apptDetailModal');
+    loadAppointments();
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error');
+  }
+}
+
+async function cancelAppt(id) {
+  try {
+    await apiFetch('/api/appointments/' + id + '/cancel', { method: 'DELETE' });
+    showToast('Appointment cancelled', 'success');
+    closeModal('apptDetailModal');
+    loadAppointments();
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error');
+  }
+}
+
+/* ========================================
+   MESSAGES
+   ======================================== */
+async function loadMessages() {
+  loadEmailLog();
+  loadSmsSequences();
+}
+
+async function loadEmailLog() {
+  try {
+    var data = await apiFetch('/api/email/log');
+    emailLog = Array.isArray(data) ? data : (data.emails || data.items || []);
+    renderEmailLog();
+  } catch (e) {
+    document.getElementById('emailBody').innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>' + escapeHtml(e.message) + '</p></div></td></tr>';
+  }
+}
+
+function renderEmailLog() {
+  var el = document.getElementById('emailBody');
+  if (!emailLog.length) {
+    el.innerHTML = '<tr><td colspan="5"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><p>No emails</p></div></td></tr>';
+    return;
+  }
+  var html = '';
+  emailLog.forEach(function(e) {
+    html += '<tr>';
+    html += '<td style="font-weight:500">' + escapeHtml(e.subject || '--') + '</td>';
+    html += '<td>' + escapeHtml(e.recipient || e.to || '--') + '</td>';
+    html += '<td>' + capitalize(e.template_type || e.template || '--') + '</td>';
+    html += '<td>' + emailStatusBadge(e.status) + '</td>';
+    html += '<td>' + formatDate(e.sent_at || e.date || e.created_at) + '</td>';
+    html += '</tr>';
+  });
+  el.innerHTML = html;
+}
+
+async function loadSmsSequences() {
+  try {
+    var data = await apiFetch('/api/sms/sequences');
+    smsSequences = Array.isArray(data) ? data : (data.sequences || data.items || []);
+    renderSmsSequences();
+  } catch (e) {
+    document.getElementById('smsBody').innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>' + escapeHtml(e.message) + '</p></div></td></tr>';
+  }
+}
+
+function renderSmsSequences() {
+  var el = document.getElementById('smsBody');
+  if (!smsSequences.length) {
+    el.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><p>No SMS sequences</p></div></td></tr>';
+    return;
+  }
+  var html = '';
+  smsSequences.forEach(function(seq, idx) {
+    var statusBadge = seq.status === 'active' ? 'badge-green' : seq.status === 'completed' ? 'badge-gray' : seq.status === 'opted_out' ? 'badge-red' : 'badge-blue';
+    html += '<tr class="seq-row" onclick="toggleSeqExpand(' + idx + ')">';
+    html += '<td style="font-weight:600">' + escapeHtml(seq.lead_name || seq.lead || '--') + '</td>';
+    html += '<td>' + capitalize(seq.sequence_type || seq.type || '--') + '</td>';
+    html += '<td>Step ' + (seq.current_step || 1) + '</td>';
+    html += '<td>' + formatDate(seq.next_send_date || seq.next_send) + '</td>';
+    html += '<td><span class="badge ' + statusBadge + '">' + capitalize(seq.status || 'active') + '</span></td>';
+    html += '<td>';
+    if (seq.status === 'active') {
+      html += '<button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();triggerNext(\'' + seq.id + '\')">Trigger Next</button>';
+      html += '<button class="btn btn-sm btn-ghost" style="color:var(--color-error)" onclick="event.stopPropagation();optOutSms(\'' + seq.id + '\')">Opt Out</button>';
+    }
+    html += '</td></tr>';
+
+    // Expandable steps row
+    html += '<tr class="seq-steps" id="seqSteps' + idx + '"><td colspan="6"><div class="seq-steps-inner">';
+    var steps = seq.steps || seq.messages || [];
+    if (steps.length) {
+      steps.forEach(function(step, si) {
+        var stepStatus = step.status || 'pending';
+        html += '<div class="seq-step">';
+        html += '<div class="seq-step-num ' + stepStatus + '">' + (si + 1) + '</div>';
+        html += '<span>' + escapeHtml(step.message || step.content || 'Step ' + (si + 1)) + '</span>';
+        html += '<span style="margin-left:auto">' + capitalize(stepStatus) + '</span>';
+        html += '</div>';
+      });
+    } else {
+      html += '<p style="font-size:var(--text-xs);color:var(--color-text-muted)">No step details available</p>';
+    }
+    html += '</div></td></tr>';
+  });
+  el.innerHTML = html;
+}
+
+function toggleSeqExpand(idx) {
+  var row = document.getElementById('seqSteps' + idx);
+  if (row) row.classList.toggle('expanded');
+}
+
+async function triggerNext(id) {
+  try {
+    await apiFetch('/api/sms/trigger', {
+      method: 'POST',
+      body: JSON.stringify({ sequence_id: id })
+    });
+    showToast('Next step triggered', 'success');
+    loadSmsSequences();
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error');
+  }
+}
+
+async function optOutSms(id) {
+  try {
+    await apiFetch('/api/sms/opt-out/' + id, { method: 'POST' });
+    showToast('Opted out', 'success');
+    loadSmsSequences();
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error');
+  }
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+/* ========================================
+   SETTINGS
+   ======================================== */
+function loadSettings() {
+  document.getElementById('apiBaseDisplay').textContent = API_BASE_URL;
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+function escapeHtml(text) {
+  if (!text) return '';
+  var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+/* ========================================
+   REFRESH / INIT
+   ======================================== */
+async function refreshData() {
+  showToast('Refreshing data...', 'info');
+  await checkHealth();
+  if (currentPage === 'dashboard') loadDashboard();
+  else if (currentPage === 'leads') loadLeads();
+  else if (currentPage === 'appointments') loadAppointments();
+  else if (currentPage === 'messages') loadMessages();
+}
+
+function startAutoRefresh() {
+  if (refreshInterval) clearInterval(refreshInterval);
+  refreshInterval = setInterval(function() {
+    checkHealth();
+    if (currentPage === 'dashboard') loadDashboard();
+  }, 30000);
+}
+
+// Initialize
+(function init() {
+  checkHealth();
+  handleHashChange();
+  startAutoRefresh();
+})();
+
+</script>
+</body>
+</html>
