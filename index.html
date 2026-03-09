@@ -2283,7 +2283,8 @@ let state = {
   currentPage: 'command-center',
   calendarWeekStart: getWeekStart(new Date()),
   apptView: 'calendar',
-  autoRefreshTimer: null
+  autoRefreshTimer: null,
+  botsApiData: []
 };
 
 /* ========================================
@@ -2552,6 +2553,12 @@ async function loadCommandCenter() {
   animateValue('kpi-emails', emailsSent);
   animateValue('kpi-sms', smsSent);
 
+  // Fetch live bot stats
+  try {
+    const botsResp = await apiFetch('/api/bots/status');
+    state.botsApiData = (botsResp && botsResp.bots) ? botsResp.bots : [];
+  } catch(e) { state.botsApiData = []; }
+
   // Bot Status
   renderBotStatusPanel(dashboard);
 
@@ -2580,79 +2587,102 @@ function renderBotStatusPanel(dashboard) {
   const scheduler = dashboard ? dashboard.scheduler : null;
   const health = state.health;
 
-  // Derive bot statuses from dashboard + health data
+  // Try to use live bot data if loaded
+  const apiBots = state.botsApiData || [];
+  
+  function apiStat(botId, statKey, fallback) {
+    const b = apiBots.find(x => x.id === botId);
+    return b && b.stats && b.stats[statKey] != null ? b.stats[statKey] : fallback;
+  }
+  function apiStatus(botId, fallback) {
+    const b = apiBots.find(x => x.id === botId);
+    return b ? b.status : fallback;
+  }
+  function apiActivity(botId) {
+    const b = apiBots.find(x => x.id === botId);
+    return b ? b.last_activity : null;
+  }
+
   const bots = [
     {
       name: 'Email Autoresponder',
       provider: (health && health.email_provider) || 'SendGrid',
-      status: 'active',
-      stat: state.emailLogs.length,
+      status: apiStatus('email_autoresponder', 'active'),
+      stat: apiStat('email_autoresponder', 'sent', state.emailLogs.length),
       statLabel: 'Emails',
-      lastActivity: state.emailLogs.length > 0 ? state.emailLogs[0].created_at : null
+      lastActivity: apiActivity('email_autoresponder') || (state.emailLogs.length > 0 ? state.emailLogs[0].created_at : null)
     },
     {
       name: 'SMS Follow-Up',
       provider: (health && health.sms_provider) || 'Twilio',
-      status: state.smsSequences.length > 0 ? 'active' : 'standby',
-      stat: state.smsSequences.length,
+      status: apiStatus('sms_followup', state.smsSequences.length > 0 ? 'active' : 'standby'),
+      stat: apiStat('sms_followup', 'active_sequences', state.smsSequences.length),
       statLabel: 'Sequences',
-      lastActivity: state.smsSequences.length > 0 ? state.smsSequences[0].created_at : null
+      lastActivity: apiActivity('sms_followup') || (state.smsSequences.length > 0 ? state.smsSequences[0].created_at : null)
     },
     {
       name: 'Lead Intake',
       provider: 'Webhook',
-      status: state.leads.length > 0 ? 'active' : 'standby',
-      stat: state.leads.length,
+      status: apiStatus('lead_intake', state.leads.length > 0 ? 'active' : 'standby'),
+      stat: apiStat('lead_intake', 'total_leads', state.leads.length),
       statLabel: 'Leads',
-      lastActivity: state.leads.length > 0 ? state.leads[state.leads.length - 1].created_at : null
+      lastActivity: apiActivity('lead_intake') || (state.leads.length > 0 ? state.leads[state.leads.length - 1].created_at : null)
     },
     {
       name: 'Appointment Scheduler',
-      provider: 'Internal',
-      status: state.appointments.length > 0 ? 'active' : 'standby',
-      stat: state.appointments.length,
+      provider: 'Calendly',
+      status: apiStatus('appointment_scheduler', state.appointments.length > 0 ? 'active' : 'standby'),
+      stat: apiStat('appointment_scheduler', 'upcoming', state.appointments.length),
       statLabel: 'Booked',
-      lastActivity: state.appointments.length > 0 ? state.appointments[0].created_at : null
+      lastActivity: apiActivity('appointment_scheduler') || (state.appointments.length > 0 ? state.appointments[0].created_at : null)
     },
     {
       name: 'Background Scheduler',
       provider: 'APScheduler',
-      status: (scheduler && scheduler.running) ? 'active' : 'stopped',
-      stat: (scheduler && scheduler.jobs) ? scheduler.jobs.length : 0,
+      status: apiStatus('background_scheduler', (scheduler && scheduler.running) ? 'active' : 'stopped'),
+      stat: apiStat('background_scheduler', 'jobs', (scheduler && scheduler.jobs) ? scheduler.jobs.length : 0),
       statLabel: 'Jobs',
-      lastActivity: dashboard ? dashboard.generated_at : null
+      lastActivity: apiActivity('background_scheduler') || (dashboard ? dashboard.generated_at : null)
     },
     {
       name: 'Email Automation',
       provider: 'Internal',
-      status: 'active',
-      stat: state.emailLogs.filter(e => e.template_type && e.template_type.startsWith('sequence_')).length,
-      statLabel: 'Seq. Emails',
-      lastActivity: null
+      status: apiStatus('email_automation', 'active'),
+      stat: apiStat('email_automation', 'active_sequences', '--'),
+      statLabel: 'Seq. Active',
+      lastActivity: apiActivity('email_automation')
     },
     {
       name: 'Content Generator',
-      provider: 'OpenAI',
-      status: 'standby',
-      stat: '--',
+      provider: 'Internal',
+      status: apiStatus('content_generator', 'standby'),
+      stat: apiStat('content_generator', 'total_generated', '--'),
       statLabel: 'Posts',
-      lastActivity: null
+      lastActivity: apiActivity('content_generator')
     },
     {
-      name: 'Social Media Poster',
+      name: 'Social Poster',
       provider: 'Meta API',
-      status: 'standby',
-      stat: '--',
-      statLabel: 'Posts',
-      lastActivity: null
+      status: apiStatus('social_poster', 'standby'),
+      stat: apiStat('social_poster', 'total_posted', '--'),
+      statLabel: 'Posted',
+      lastActivity: apiActivity('social_poster')
     },
     {
-      name: 'Instagram Lead Bot',
+      name: 'IG Lead Bot',
       provider: 'Instagram DM',
-      status: 'standby',
-      stat: '--',
+      status: apiStatus('ig_lead_bot', 'standby'),
+      stat: apiStat('ig_lead_bot', 'total_conversations', '--'),
       statLabel: 'DMs',
-      lastActivity: null
+      lastActivity: apiActivity('ig_lead_bot')
+    },
+    {
+      name: 'SEO Bot',
+      provider: 'Internal',
+      status: apiStatus('seo_bot', 'active'),
+      stat: apiStat('seo_bot', 'total_reports', '--'),
+      statLabel: 'Reports',
+      lastActivity: apiActivity('seo_bot')
     }
   ];
 
@@ -3395,6 +3425,19 @@ async function loadBotsPage() {
         { value: '--', label: 'Open Rate' }
       ],
       lastActivity: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? b.last_activity : null; })()
+    },
+    {
+      name: 'SEO Bot',
+      icon: 'search',
+      provider: 'Internal',
+      status: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? b.status : 'active'; })(),
+      desc: 'Automated SEO analysis, keyword research, competitor monitoring, Google Business Profile optimization, and schema markup generation for the Miami water treatment market.',
+      stats: [
+        { value: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? (b.stats.total_reports || 0) : '--'; })(), label: 'Reports' },
+        { value: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? (b.stats.keywords_tracked || 0) : '--'; })(), label: 'Keywords Tracked' },
+        { value: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? (b.stats.total_gbp_posts || 0) : '--'; })(), label: 'GBP Posts' }
+      ],
+      lastActivity: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? b.last_activity : null; })()
     }
   ];
 
