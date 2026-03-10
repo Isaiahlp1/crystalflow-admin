@@ -122,36 +122,36 @@
     <!-- ============================== -->
     <section class="view active" id="view-dashboard">
       <div class="kpi-grid">
-        <div class="kpi-card accent-cyan">
+        <div class="kpi-card accent-blue">
           <div class="kpi-label">Revenue (MTD)</div>
-          <div class="kpi-value" data-count="47850">$0</div>
-          <div class="kpi-delta up">
+          <div class="kpi-value" data-count="0" data-kpi-key="revenue">$0</div>
+          <div class="kpi-delta up" data-kpi-sub="revenue">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-            23% vs last month
+            Loading...
           </div>
         </div>
-        <div class="kpi-card accent-pink">
+        <div class="kpi-card accent-teal">
           <div class="kpi-label">Active Leads</div>
-          <div class="kpi-value" data-count="34">0</div>
-          <div class="kpi-delta up">
+          <div class="kpi-value" data-count="0" data-kpi-key="leads">0</div>
+          <div class="kpi-delta up" data-kpi-sub="leads">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-            12 new this week
+            Loading...
           </div>
         </div>
-        <div class="kpi-card accent-violet">
+        <div class="kpi-card accent-orange">
           <div class="kpi-label">Conversion Rate</div>
-          <div class="kpi-value" data-count="38" data-suffix="%">0%</div>
-          <div class="kpi-delta up">
+          <div class="kpi-value" data-count="0" data-suffix="%" data-kpi-key="conversion">0%</div>
+          <div class="kpi-delta up" data-kpi-sub="conversion">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-            5% vs last month
+            Loading...
           </div>
         </div>
-        <div class="kpi-card accent-success">
+        <div class="kpi-card accent-teal-dark">
           <div class="kpi-label">Installs Completed</div>
-          <div class="kpi-value" data-count="12">0</div>
-          <div class="kpi-delta up">
+          <div class="kpi-value" data-count="0" data-kpi-key="installs">0</div>
+          <div class="kpi-delta up" data-kpi-sub="installs">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-            3 this week
+            Loading...
           </div>
         </div>
       </div>
@@ -196,6 +196,19 @@
             </div>
           </div>
           <div class="chart-wrapper"><canvas id="packageChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="chart-card" id="activityFeedCard" style="margin-bottom: var(--space-6);">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Recent Activity</div>
+            <div class="chart-card-subtitle">Live feed from all channels</div>
+          </div>
+        </div>
+        <div id="activityFeed" class="activity-feed">
+          <div class="activity-item" style="padding: var(--space-4); color: var(--color-text-faint); font-size: var(--text-sm);">Loading activity...</div>
         </div>
       </div>
 

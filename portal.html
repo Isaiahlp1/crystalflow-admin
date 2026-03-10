@@ -46,23 +46,56 @@
         <div class="login-logo-sub">My Account</div>
       </div>
     </div>
-    <h1 class="login-heading">Welcome Back</h1>
-    <p class="login-subtext">Sign in to manage your water filtration system</p>
-    <form class="login-form" id="loginForm">
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input class="form-input" type="email" placeholder="maria.santos@gmail.com" id="loginEmail">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-input" type="password" placeholder="Enter your password" id="loginPassword">
-      </div>
-      <button class="btn btn-primary btn-block" type="submit">Sign In</button>
-      <div class="login-links">
-        <a href="#" onclick="return false">Forgot password?</a>
-        <span>Don't have an account? <a href="#" onclick="return false">Contact us</a></span>
-      </div>
-    </form>
+    <!-- Login Form -->
+    <div id="loginSection">
+      <h1 class="login-heading">Welcome Back</h1>
+      <p class="login-subtext">Sign in to manage your water filtration system</p>
+      <div class="login-error" id="loginError" style="display:none; background: rgba(248,113,113,0.12); color: #F87171; padding: 10px 14px; border-radius: 6px; font-size: 0.875rem; margin-bottom: 16px;"></div>
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="you@email.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="Enter your password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+        <div class="login-links">
+          <a href="#" onclick="return false">Forgot password?</a>
+          <span>Don't have an account? <a href="#" id="registerLink">Create one</a></span>
+        </div>
+      </form>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerSection" style="display:none;">
+      <h1 class="login-heading">Create Account</h1>
+      <p class="login-subtext">Set up your CrystalFlow customer account</p>
+      <div class="login-error" id="registerError" style="display:none; background: rgba(248,113,113,0.12); color: #F87171; padding: 10px 14px; border-radius: 6px; font-size: 0.875rem; margin-bottom: 16px;"></div>
+      <form class="login-form" id="registerForm">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" type="text" name="name" placeholder="Your full name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="you@email.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-input" type="tel" placeholder="(305) 555-0123">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="Create a password" required minlength="6">
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Create Account</button>
+        <div class="login-links">
+          <span>Already have an account? <a href="#" id="loginLink">Sign in</a></span>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -90,7 +123,7 @@
       </div>
     </div>
     <div class="topbar-right">
-      <span class="topbar-greeting">Hi, <strong>Maria</strong></span>
+      <span class="topbar-greeting">Hi, <strong id="portalGreetingName">there</strong></span>
       <button class="btn btn-secondary btn-sm" id="signOutBtn">Sign Out</button>
     </div>
   </header>
