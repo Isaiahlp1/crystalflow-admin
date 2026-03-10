@@ -61,8 +61,8 @@
       <div class="sidebar-section-label">Manage</div>
       <a class="nav-item" data-view="portal" href="#portal">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Customer Portal
-        <span class="nav-badge">3</span>
+        Accounts
+        <span class="nav-badge" id="accountsBadge">0</span>
       </a>
       <a class="nav-item" data-view="dispatch" href="#dispatch">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
@@ -381,212 +381,170 @@
     <!-- VIEW: CUSTOMER PORTAL          -->
     <!-- ============================== -->
     <section class="view" id="view-portal">
-      <div class="portal-grid">
-        <div class="customer-profile-card">
-          <div class="profile-header">
-            <div class="profile-avatar">MS</div>
-            <div class="profile-name">Maria Santos</div>
-            <div class="profile-email">maria.santos@gmail.com</div>
+      <!-- Accounts Toolbar -->
+      <div class="accounts-toolbar">
+        <div class="accounts-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="accountsSearchInput" placeholder="Search by name, email, or phone...">
+        </div>
+        <div class="accounts-filters">
+          <select id="accountsStatusFilter" class="accounts-filter-select">
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <button class="btn btn-primary" id="addCustomerBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 5v14M5 12h14"/></svg>
+            Add Customer
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer Table -->
+      <div class="accounts-table-card">
+        <div style="overflow-x: auto;">
+          <table class="data-table" id="accountsTable">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Package</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="accountsTableBody">
+              <tr class="accounts-empty-row">
+                <td colspan="7">
+                  <div class="accounts-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;color:var(--color-text-faint);">
+                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <div style="color:var(--color-text-muted);margin-top:var(--space-3);">Loading accounts...</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="accounts-pagination" id="accountsPagination"></div>
+      </div>
+
+      <!-- Customer Detail Slide-out Panel -->
+      <div class="account-detail-overlay" id="accountDetailOverlay"></div>
+      <div class="account-detail-panel" id="accountDetailPanel">
+        <div class="account-detail-header">
+          <div style="display:flex;align-items:center;gap:var(--space-3);">
+            <div class="profile-avatar" id="detailAvatar">--</div>
+            <div>
+              <div class="profile-name" id="detailName">--</div>
+              <div class="profile-email" id="detailEmail">--</div>
+            </div>
           </div>
-          <div class="profile-body">
-            <div class="profile-info-row">
-              <span class="profile-info-label">Phone</span>
-              <span class="profile-info-value">(305) 555-0142</span>
+          <button class="btn-icon" id="closeDetailBtn" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="account-detail-body">
+          <div class="account-detail-info">
+            <div class="profile-info-row"><span class="profile-info-label">Phone</span><span class="profile-info-value" id="detailPhone">--</span></div>
+            <div class="profile-info-row"><span class="profile-info-label">Address</span><span class="profile-info-value" id="detailAddress">--</span></div>
+            <div class="profile-info-row"><span class="profile-info-label">Package</span><span class="profile-info-value" id="detailPackage" style="color:var(--color-cyan);">--</span></div>
+            <div class="profile-info-row"><span class="profile-info-label">Status</span><span class="profile-info-value" id="detailStatus">--</span></div>
+            <div class="profile-info-row"><span class="profile-info-label">Created</span><span class="profile-info-value" id="detailCreated">--</span></div>
+          </div>
+
+          <!-- Detail Tabs -->
+          <div class="portal-tabs" style="margin-top:var(--space-5);">
+            <button class="portal-tab active" data-detail-tab="warranty">Warranty</button>
+            <button class="portal-tab" data-detail-tab="service">Service Requests</button>
+            <button class="portal-tab" data-detail-tab="invoices">Invoices</button>
+          </div>
+
+          <div class="portal-tab-content active" id="detail-warranty">
+            <div id="detailWarrantyContent" class="detail-section-content">
+              <div class="accounts-empty" style="padding:var(--space-6) 0;">
+                <div style="color:var(--color-text-faint);">No warranty info available</div>
+              </div>
             </div>
-            <div class="profile-info-row">
-              <span class="profile-info-label">Address</span>
-              <span class="profile-info-value">1842 Brickell Ave, 33139</span>
+          </div>
+
+          <div class="portal-tab-content" id="detail-service">
+            <div id="detailServiceContent" class="detail-section-content">
+              <div class="accounts-empty" style="padding:var(--space-6) 0;">
+                <div style="color:var(--color-text-faint);">No service requests</div>
+              </div>
             </div>
-            <div class="profile-info-row">
-              <span class="profile-info-label">Package</span>
-              <span class="profile-info-value" style="color: var(--color-cyan);">Pure Life</span>
-            </div>
-            <div class="profile-info-row">
-              <span class="profile-info-label">Install Date</span>
-              <span class="profile-info-value">Feb 14, 2026</span>
-            </div>
-            <div class="profile-info-row">
-              <span class="profile-info-label">Lifetime Value</span>
-              <span class="profile-info-value" style="color: var(--color-success);">$3,447</span>
-            </div>
-            <div class="profile-info-row">
-              <span class="profile-info-label">Lead Score</span>
-              <span class="profile-info-value">92 / 100</span>
+          </div>
+
+          <div class="portal-tab-content" id="detail-invoices">
+            <div id="detailInvoicesContent" class="detail-section-content">
+              <div class="accounts-empty" style="padding:var(--space-6) 0;">
+                <div style="color:var(--color-text-faint);">No invoices found</div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="portal-content">
-          <div class="portal-tabs">
-            <button class="portal-tab active" data-portal-tab="activity">Activity</button>
-            <button class="portal-tab" data-portal-tab="invoices">Invoices</button>
-            <button class="portal-tab" data-portal-tab="warranty">Warranty</button>
-            <button class="portal-tab" data-portal-tab="service">Service</button>
+      <!-- Add Customer Modal -->
+      <div class="modal-overlay" id="addCustomerOverlay">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="modal-title">Add New Customer</div>
+            <button class="btn-icon" id="closeAddCustomerBtn" title="Close">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
           </div>
-
-          <!-- Activity Tab -->
-          <div class="portal-tab-content active" id="portal-activity">
-            <div class="chart-card">
-              <div class="timeline">
-                <div class="timeline-item">
-                  <div class="timeline-dot cyan">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
-                  </div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Installation Completed</div>
-                    <div class="timeline-desc">Pure Life system installed by Marco R. — Customer rated 5 stars</div>
-                    <div class="timeline-time">Feb 14, 2026 — 2:30 PM</div>
-                  </div>
+          <form id="addCustomerForm">
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-input" id="newCustFirstName" required>
                 </div>
-                <div class="timeline-item">
-                  <div class="timeline-dot success">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-                  </div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Payment Received — $2,899</div>
-                    <div class="timeline-desc">Deposit + final payment via Stripe. Invoice #CF-1042</div>
-                    <div class="timeline-time">Feb 14, 2026 — 3:15 PM</div>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-dot pink">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
-                  </div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Quote Sent — Pure Life Package</div>
-                    <div class="timeline-desc">Sent via email. Opened 3 times before accepting</div>
-                    <div class="timeline-time">Feb 10, 2026 — 11:20 AM</div>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-dot violet">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                  </div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Water Test Consultation</div>
-                    <div class="timeline-desc">In-home visit. TDS reading: 380 ppm. Recommended Pure Life package</div>
-                    <div class="timeline-time">Feb 8, 2026 — 10:00 AM</div>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-dot cyan">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                  </div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Lead Created</div>
-                    <div class="timeline-desc">Source: Google Ads — searched "water softener miami beach"</div>
-                    <div class="timeline-time">Feb 5, 2026 — 9:12 AM</div>
-                  </div>
+                <div class="form-group">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-input" id="newCustLastName" required>
                 </div>
               </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="newCustEmail" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Phone</label>
+                  <input type="tel" class="form-input" id="newCustPhone">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Package</label>
+                  <select class="form-input" id="newCustPackage">
+                    <option value="">None</option>
+                    <option value="Kitchen Guard">Kitchen Guard</option>
+                    <option value="Home Shield">Home Shield</option>
+                    <option value="Pure Life">Pure Life</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-input" id="newCustAddress" placeholder="1234 Main St, Miami, FL 33101">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="newCustPassword" required minlength="6" placeholder="Min 6 characters">
+              </div>
+              <div id="addCustomerError" class="form-error" style="display:none;"></div>
             </div>
-          </div>
-
-          <!-- Invoices Tab -->
-          <div class="portal-tab-content" id="portal-invoices">
-            <div class="table-card">
-              <div style="overflow-x: auto;">
-                <table class="data-table">
-                  <thead>
-                    <tr><th>Invoice</th><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>#CF-1042</td><td>Feb 14, 2026</td><td>Pure Life Installation — Final Payment</td><td>$1,449.50</td><td><span class="badge badge-completed">Paid</span></td></tr>
-                    <tr><td>#CF-1041</td><td>Feb 10, 2026</td><td>Pure Life Installation — 50% Deposit</td><td>$1,449.50</td><td><span class="badge badge-completed">Paid</span></td></tr>
-                    <tr><td>#CF-1056</td><td>Mar 8, 2026</td><td>Extended Warranty — Platinum (2yr)</td><td>$149.00</td><td><span class="badge badge-completed">Paid</span></td></tr>
-                    <tr><td>#CF-1070</td><td>Mar 14, 2026</td><td>Filter Subscription — 6-Month</td><td>$99.00</td><td><span class="badge badge-pending">Upcoming</span></td></tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id="cancelAddCustomerBtn">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="submitAddCustomerBtn">Create Account</button>
             </div>
-          </div>
-
-          <!-- Warranty Tab -->
-          <div class="portal-tab-content" id="portal-warranty">
-            <div class="warranty-card">
-              <div class="warranty-header">
-                <div class="warranty-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div>
-                  <div class="warranty-title">Platinum Extended Warranty</div>
-                  <div class="warranty-subtitle">Pure Life — Waterdrop X16 (1600 GPD)</div>
-                </div>
-              </div>
-              <div class="warranty-progress">
-                <div class="warranty-progress-bar" style="width: 4%;"></div>
-              </div>
-              <div class="warranty-dates">
-                <span>Start: Feb 14, 2026</span>
-                <span>Expires: Feb 14, 2028</span>
-              </div>
-              <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--color-border-subtle);">
-                <div class="profile-info-row"><span class="profile-info-label">Coverage</span><span class="profile-info-value">Parts + Labor</span></div>
-                <div class="profile-info-row"><span class="profile-info-label">Response Time</span><span class="profile-info-value">24 hours</span></div>
-                <div class="profile-info-row"><span class="profile-info-label">Filter Changes</span><span class="profile-info-value">2 included</span></div>
-                <div class="profile-info-row"><span class="profile-info-label">Transferable</span><span class="profile-info-value" style="color: var(--color-success);">Yes</span></div>
-              </div>
-            </div>
-
-            <div class="warranty-card" style="margin-top: var(--space-4);">
-              <div class="warranty-header">
-                <div class="warranty-icon" style="background: var(--color-cyan-glow); color: var(--color-cyan);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
-                </div>
-                <div>
-                  <div class="warranty-title">Manufacturer Warranty</div>
-                  <div class="warranty-subtitle">Waterdrop Standard — 1 Year</div>
-                </div>
-              </div>
-              <div class="warranty-progress">
-                <div class="warranty-progress-bar" style="width: 8%; background: linear-gradient(90deg, var(--color-cyan), var(--color-violet));"></div>
-              </div>
-              <div class="warranty-dates">
-                <span>Start: Feb 14, 2026</span>
-                <span>Expires: Feb 14, 2027</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Tab -->
-          <div class="portal-tab-content" id="portal-service">
-            <div class="chart-card" style="margin-bottom: var(--space-4);">
-              <div class="chart-card-header">
-                <div class="chart-card-title">Next Filter Change</div>
-                <span class="badge badge-scheduled">Scheduled</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: var(--space-5); padding: var(--space-4) 0;">
-                <div style="text-align: center;">
-                  <div style="font-size: var(--text-xl); font-weight: 700; color: var(--color-cyan); font-variant-numeric: tabular-nums;">158</div>
-                  <div style="font-size: var(--text-xs); color: var(--color-text-muted);">Days Until Due</div>
-                </div>
-                <div style="flex: 1;">
-                  <div class="warranty-progress" style="height: 8px;">
-                    <div class="warranty-progress-bar" style="width: 15%; background: linear-gradient(90deg, var(--color-cyan), var(--color-violet));"></div>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; margin-top: var(--space-2);">
-                    <span style="font-size: var(--text-xs); color: var(--color-text-faint);">Installed Feb 14</span>
-                    <span style="font-size: var(--text-xs); color: var(--color-text-faint);">Due Aug 14</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="table-card">
-              <div class="table-card-header">
-                <div class="table-card-title">Service History</div>
-              </div>
-              <div style="overflow-x: auto;">
-                <table class="data-table">
-                  <thead>
-                    <tr><th>Date</th><th>Service</th><th>Technician</th><th>Status</th><th>Notes</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>Feb 14, 2026</td><td>Initial Installation</td><td>Marco R.</td><td><span class="badge badge-completed">Completed</span></td><td>Clean install, TDS reduced to 12 ppm</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </section>

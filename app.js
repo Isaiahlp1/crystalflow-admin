@@ -15,7 +15,7 @@
   var viewTitles = {
     dashboard: "Analytics Dashboard",
     quote: "Instant Quote Calculator",
-    portal: "Customer Portal",
+    portal: "Accounts",
     dispatch: "Technician Dispatch",
     automations: "Automations",
   };
@@ -23,7 +23,7 @@
   var ctaLabels = {
     dashboard: "+ New Lead",
     quote: "Send Quote",
-    portal: "Add Customer",
+    portal: "+ Add Customer",
     dispatch: "New Job",
     automations: "+ New Automation",
   };
@@ -423,14 +423,338 @@
     return icons[type] || icons.status_change;
   }
 
-  /* ===== PORTAL CUSTOMER LIST ===== */
+  /* ===== ACCOUNTS MANAGEMENT ===== */
+  var accountsPage = 0;
+  var accountsLimit = 20;
+  var accountsTotal = 0;
+  var allCustomers = [];
+  var accountsLoaded = false;
+
   function loadPortalCustomers() {
-    api("/api/admin/customers?limit=20")
+    var offset = accountsPage * accountsLimit;
+    api("/api/admin/customers?limit=" + accountsLimit + "&offset=" + offset)
       .then(function (data) {
-        var badge = document.querySelector('.nav-item[data-view="portal"] .badge');
-        if (badge) badge.textContent = data.total;
+        accountsTotal = data.total || 0;
+        allCustomers = data.customers || [];
+        var badge = document.getElementById("accountsBadge");
+        if (badge) badge.textContent = accountsTotal;
+        renderAccountsTable(allCustomers);
+        renderAccountsPagination();
+        accountsLoaded = true;
       })
-      .catch(function () { /* ignore */ });
+      .catch(function (err) {
+        console.error("Failed to load customers:", err);
+        var tbody = document.getElementById("accountsTableBody");
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="7"><div class="accounts-empty">' +
+            '<div style="color:var(--color-error);">Failed to load accounts. Retrying...</div></div></td></tr>';
+        }
+        setTimeout(loadPortalCustomers, 3000);
+      });
+  }
+
+  function getInitials(first, last) {
+    var f = (first || "").trim();
+    var l = (last || "").trim();
+    return ((f[0] || "") + (l[0] || "")).toUpperCase() || "??";
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return "--";
+    try {
+      var d = new Date(dateStr);
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    } catch (e) { return dateStr; }
+  }
+
+  function statusBadgeClass(status) {
+    var s = (status || "pending").toLowerCase();
+    if (s === "active") return "badge-completed";
+    if (s === "inactive") return "badge-cancelled";
+    return "badge-pending";
+  }
+
+  function renderAccountsTable(customers) {
+    var tbody = document.getElementById("accountsTableBody");
+    if (!tbody) return;
+
+    // Apply search filter
+    var searchVal = (document.getElementById("accountsSearchInput") || {}).value || "";
+    searchVal = searchVal.toLowerCase().trim();
+    var statusFilter = (document.getElementById("accountsStatusFilter") || {}).value || "all";
+
+    var filtered = customers.filter(function (c) {
+      var matchSearch = !searchVal ||
+        ((c.first_name || "") + " " + (c.last_name || "")).toLowerCase().indexOf(searchVal) !== -1 ||
+        (c.email || "").toLowerCase().indexOf(searchVal) !== -1 ||
+        (c.phone || "").toLowerCase().indexOf(searchVal) !== -1;
+      var matchStatus = statusFilter === "all" || (c.status || "pending").toLowerCase() === statusFilter;
+      return matchSearch && matchStatus;
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="accounts-empty">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;color:var(--color-text-faint);">' +
+        '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
+        '<div style="color:var(--color-text-muted);margin-top:var(--space-3);">' +
+        (searchVal || statusFilter !== "all" ? "No accounts match your search" : "No customer accounts yet") +
+        '</div></div></td></tr>';
+      return;
+    }
+
+    var html = "";
+    filtered.forEach(function (c) {
+      var initials = getInitials(c.first_name, c.last_name);
+      var name = ((c.first_name || "") + " " + (c.last_name || "")).trim() || "Unknown";
+      var status = c.status || "pending";
+      html += '<tr class="accounts-row" data-customer-id="' + (c.id || "") + '">' +
+        '<td><div class="accounts-customer-cell">' +
+          '<div class="accounts-customer-avatar">' + initials + '</div>' +
+          '<span class="accounts-customer-name">' + name + '</span>' +
+        '</div></td>' +
+        '<td>' + (c.email || "--") + '</td>' +
+        '<td>' + (c.phone || "--") + '</td>' +
+        '<td style="color:var(--color-cyan);">' + (c.package || "--") + '</td>' +
+        '<td><span class="badge ' + statusBadgeClass(status) + '">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span></td>' +
+        '<td>' + formatDate(c.created_at) + '</td>' +
+        '<td><button class="view-row-btn" title="View details" data-cid="' + (c.id || "") + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>' +
+        '</button></td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+
+    // Attach row click handlers
+    var rowBtns = tbody.querySelectorAll(".view-row-btn");
+    rowBtns.forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var cid = btn.dataset.cid;
+        var cust = allCustomers.find(function (c) { return String(c.id) === String(cid); });
+        if (cust) openAccountDetail(cust);
+      });
+    });
+
+    // Also allow clicking the whole row
+    var rows = tbody.querySelectorAll(".accounts-row");
+    rows.forEach(function (row) {
+      row.style.cursor = "pointer";
+      row.addEventListener("click", function () {
+        var cid = row.dataset.customerId;
+        var cust = allCustomers.find(function (c) { return String(c.id) === String(cid); });
+        if (cust) openAccountDetail(cust);
+      });
+    });
+  }
+
+  function renderAccountsPagination() {
+    var pag = document.getElementById("accountsPagination");
+    if (!pag) return;
+    var totalPages = Math.max(1, Math.ceil(accountsTotal / accountsLimit));
+    var currentPage = accountsPage + 1;
+    pag.innerHTML = '<span>Showing ' + Math.min(accountsPage * accountsLimit + 1, accountsTotal) +
+      ' - ' + Math.min((accountsPage + 1) * accountsLimit, accountsTotal) +
+      ' of ' + accountsTotal + ' accounts</span>' +
+      '<div class="accounts-pagination-btns">' +
+        '<button id="prevPageBtn"' + (accountsPage === 0 ? ' disabled' : '') + '>Previous</button>' +
+        '<button id="nextPageBtn"' + (currentPage >= totalPages ? ' disabled' : '') + '>Next</button>' +
+      '</div>';
+
+    var prevBtn = document.getElementById("prevPageBtn");
+    var nextBtn = document.getElementById("nextPageBtn");
+    if (prevBtn) prevBtn.addEventListener("click", function () {
+      if (accountsPage > 0) { accountsPage--; loadPortalCustomers(); }
+    });
+    if (nextBtn) nextBtn.addEventListener("click", function () {
+      if ((accountsPage + 1) * accountsLimit < accountsTotal) { accountsPage++; loadPortalCustomers(); }
+    });
+  }
+
+  /* ===== ACCOUNT DETAIL PANEL ===== */
+  var detailPanel = document.getElementById("accountDetailPanel");
+  var detailOverlay = document.getElementById("accountDetailOverlay");
+  var closeDetailBtn = document.getElementById("closeDetailBtn");
+
+  function openAccountDetail(cust) {
+    document.getElementById("detailAvatar").textContent = getInitials(cust.first_name, cust.last_name);
+    document.getElementById("detailName").textContent = ((cust.first_name || "") + " " + (cust.last_name || "")).trim() || "Unknown";
+    document.getElementById("detailEmail").textContent = cust.email || "--";
+    document.getElementById("detailPhone").textContent = cust.phone || "--";
+    document.getElementById("detailAddress").textContent = cust.address || "--";
+    document.getElementById("detailPackage").textContent = cust.package || "None";
+    document.getElementById("detailStatus").textContent = (cust.status || "pending").charAt(0).toUpperCase() + (cust.status || "pending").slice(1);
+    document.getElementById("detailCreated").textContent = formatDate(cust.created_at);
+
+    // Populate warranty section
+    var warrantyEl = document.getElementById("detailWarrantyContent");
+    if (cust.warranty_package) {
+      warrantyEl.innerHTML =
+        '<div class="warranty-card">' +
+          '<div class="warranty-header">' +
+            '<div class="warranty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>' +
+            '<div><div class="warranty-title">' + (cust.warranty_package || "Standard") + '</div>' +
+            '<div class="warranty-subtitle">' + (cust.package || "--") + '</div></div>' +
+          '</div>' +
+          (cust.warranty_start && cust.warranty_end ?
+            '<div class="warranty-dates"><span>Start: ' + formatDate(cust.warranty_start) + '</span><span>Expires: ' + formatDate(cust.warranty_end) + '</span></div>' : '') +
+        '</div>';
+    } else {
+      warrantyEl.innerHTML = '<div class="accounts-empty" style="padding:var(--space-6) 0;">' +
+        '<div style="color:var(--color-text-faint);">No warranty info available</div></div>';
+    }
+
+    // Populate service requests
+    var serviceEl = document.getElementById("detailServiceContent");
+    if (cust.service_requests && cust.service_requests.length > 0) {
+      var shtml = '<div style="display:flex;flex-direction:column;gap:var(--space-3);">';
+      cust.service_requests.forEach(function (sr) {
+        var priorityColor = sr.priority === "urgent" ? "var(--color-error)" :
+                            sr.priority === "high" ? "var(--color-warning)" : "var(--color-text-muted)";
+        shtml += '<div style="background:var(--color-surface-2);border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span style="font-weight:500;color:var(--color-text);font-size:var(--text-sm);">' + (sr.category || sr.title || "Service Request") + '</span>' +
+            '<span class="badge ' + (sr.status === "completed" ? 'badge-completed' : sr.status === "in_progress" ? 'badge-scheduled' : 'badge-pending') + '">' + (sr.status || "Pending") + '</span>' +
+          '</div>' +
+          '<div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-1);">' + formatDate(sr.created_at) +
+            ' &middot; Priority: <span style="color:' + priorityColor + ';">' + (sr.priority || "medium") + '</span></div>' +
+          (sr.description ? '<div style="font-size:var(--text-xs);color:var(--color-text-faint);margin-top:var(--space-2);">' + sr.description + '</div>' : '') +
+        '</div>';
+      });
+      shtml += '</div>';
+      serviceEl.innerHTML = shtml;
+    } else {
+      serviceEl.innerHTML = '<div class="accounts-empty" style="padding:var(--space-6) 0;">' +
+        '<div style="color:var(--color-text-faint);">No service requests</div></div>';
+    }
+
+    // Populate invoices
+    var invoicesEl = document.getElementById("detailInvoicesContent");
+    if (cust.invoices && cust.invoices.length > 0) {
+      var ihtml = '<table class="data-table" style="font-size:var(--text-xs);"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>';
+      cust.invoices.forEach(function (inv) {
+        ihtml += '<tr><td>' + formatDate(inv.date || inv.created_at) + '</td>' +
+          '<td>' + (inv.description || "--") + '</td>' +
+          '<td>$' + (inv.amount || "0") + '</td>' +
+          '<td><span class="badge ' + (inv.status === "paid" ? 'badge-completed' : 'badge-pending') + '">' + (inv.status || "Pending") + '</span></td></tr>';
+      });
+      ihtml += '</tbody></table>';
+      invoicesEl.innerHTML = ihtml;
+    } else {
+      invoicesEl.innerHTML = '<div class="accounts-empty" style="padding:var(--space-6) 0;">' +
+        '<div style="color:var(--color-text-faint);">No invoices found</div></div>';
+    }
+
+    // Reset detail tabs to warranty
+    var detailTabs = document.querySelectorAll("[data-detail-tab]");
+    detailTabs.forEach(function (t) { t.classList.remove("active"); });
+    detailTabs[0].classList.add("active");
+    document.getElementById("detail-warranty").classList.add("active");
+    document.getElementById("detail-service").classList.remove("active");
+    document.getElementById("detail-invoices").classList.remove("active");
+
+    // Open panel
+    if (detailPanel) detailPanel.classList.add("open");
+    if (detailOverlay) detailOverlay.classList.add("open");
+  }
+
+  function closeAccountDetail() {
+    if (detailPanel) detailPanel.classList.remove("open");
+    if (detailOverlay) detailOverlay.classList.remove("open");
+  }
+
+  if (closeDetailBtn) closeDetailBtn.addEventListener("click", closeAccountDetail);
+  if (detailOverlay) detailOverlay.addEventListener("click", closeAccountDetail);
+
+  // Detail tabs
+  document.querySelectorAll("[data-detail-tab]").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll("[data-detail-tab]").forEach(function (t) { t.classList.remove("active"); });
+      tab.classList.add("active");
+      document.getElementById("detail-warranty").classList.remove("active");
+      document.getElementById("detail-service").classList.remove("active");
+      document.getElementById("detail-invoices").classList.remove("active");
+      document.getElementById("detail-" + tab.dataset.detailTab).classList.add("active");
+    });
+  });
+
+  /* ===== ADD CUSTOMER MODAL ===== */
+  var addModal = document.getElementById("addCustomerOverlay");
+  var addBtn = document.getElementById("addCustomerBtn");
+  var closeAddBtn = document.getElementById("closeAddCustomerBtn");
+  var cancelAddBtn = document.getElementById("cancelAddCustomerBtn");
+  var addForm = document.getElementById("addCustomerForm");
+  var addError = document.getElementById("addCustomerError");
+
+  function openAddModal() {
+    if (addModal) addModal.classList.add("open");
+    if (addError) { addError.style.display = "none"; addError.textContent = ""; }
+    if (addForm) addForm.reset();
+  }
+  function closeAddModal() {
+    if (addModal) addModal.classList.remove("open");
+  }
+
+  if (addBtn) addBtn.addEventListener("click", openAddModal);
+  if (closeAddBtn) closeAddBtn.addEventListener("click", closeAddModal);
+  if (cancelAddBtn) cancelAddBtn.addEventListener("click", closeAddModal);
+
+  // Also wire the header CTA to open add modal when on accounts view
+  if (headerCTA) {
+    headerCTA.addEventListener("click", function () {
+      var currentView = document.querySelector(".nav-item.active");
+      if (currentView && currentView.dataset.view === "portal") {
+        openAddModal();
+      }
+    });
+  }
+
+  if (addForm) {
+    addForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var submitBtn = document.getElementById("submitAddCustomerBtn");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Creating..."; }
+      if (addError) { addError.style.display = "none"; }
+
+      var payload = {
+        first_name: (document.getElementById("newCustFirstName").value || "").trim(),
+        last_name: (document.getElementById("newCustLastName").value || "").trim(),
+        email: (document.getElementById("newCustEmail").value || "").trim(),
+        phone: (document.getElementById("newCustPhone").value || "").trim(),
+        password: document.getElementById("newCustPassword").value,
+        address: (document.getElementById("newCustAddress").value || "").trim(),
+        package: (document.getElementById("newCustPackage").value || ""),
+      };
+
+      apiPost("/api/portal/register", payload)
+        .then(function () {
+          closeAddModal();
+          accountsPage = 0;
+          loadPortalCustomers();
+        })
+        .catch(function (err) {
+          if (addError) {
+            addError.textContent = "Failed to create account. " + (err.message || "Please try again.");
+            addError.style.display = "block";
+          }
+        })
+        .finally(function () {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Create Account"; }
+        });
+    });
+  }
+
+  // Search and filter listeners
+  var searchInput = document.getElementById("accountsSearchInput");
+  var statusFilter = document.getElementById("accountsStatusFilter");
+  var searchDebounce;
+  if (searchInput) {
+    searchInput.addEventListener("input", function () {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(function () { renderAccountsTable(allCustomers); }, 250);
+    });
+  }
+  if (statusFilter) {
+    statusFilter.addEventListener("change", function () { renderAccountsTable(allCustomers); });
   }
 
   /* ===== QUOTE CALCULATOR (unchanged — all local) ===== */
@@ -498,18 +822,7 @@
   });
   recalcQuote();
 
-  /* ===== PORTAL TABS ===== */
-  var portalTabs = document.querySelectorAll(".portal-tab");
-  var portalContents = document.querySelectorAll(".portal-tab-content");
-  portalTabs.forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      portalTabs.forEach(function (t) { t.classList.remove("active"); });
-      portalContents.forEach(function (c) { c.classList.remove("active"); });
-      tab.classList.add("active");
-      var tabTarget = document.getElementById("portal-" + tab.dataset.portalTab);
-      if (tabTarget) tabTarget.classList.add("active");
-    });
-  });
+  /* Portal tabs removed — now handled by accounts detail panel logic above */
 
   /* ===== JOB BLOCK INTERACTION ===== */
   document.querySelectorAll(".job-block").forEach(function (block) {
