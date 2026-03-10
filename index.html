@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <!--
    ______                            __
@@ -11,3749 +11,884 @@
         Created with Perplexity Computer
         https://www.perplexity.ai/computer
 -->
-
-<!-- Perplexity Computer Attribution — SEO Meta Tags -->
 <meta name="generator" content="Perplexity Computer">
 <meta name="author" content="Perplexity Computer">
 <meta property="og:see_also" content="https://www.perplexity.ai/computer">
 <link rel="author" href="https://www.perplexity.ai/computer">
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CrystalFlow Miami — Command Center</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-
-<style>
-/* ========================================
-   CSS RESET & VARIABLES
-   ======================================== */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  /* Colors */
-  --primary: #0066CC;
-  --primary-light: #E8F2FF;
-  --primary-dark: #004D99;
-  --secondary: #00A5A8;
-  --secondary-light: #E6F7F7;
-  --accent: #FF6B35;
-  --accent-light: #FFF0EA;
-
-  /* Status */
-  --green: #16A34A;
-  --green-light: #DCFCE7;
-  --yellow: #EAB308;
-  --yellow-light: #FEF9C3;
-  --red: #DC2626;
-  --red-light: #FEE2E2;
-  --orange: #F97316;
-  --orange-light: #FFEDD5;
-
-  /* Neutrals */
-  --gray-50: #F9FAFB;
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  --gray-300: #D1D5DB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;
-  --gray-600: #4B5563;
-  --gray-700: #374151;
-  --gray-800: #1F2937;
-  --gray-900: #111827;
-
-  /* Surfaces */
-  --bg: #F3F4F6;
-  --surface: #FFFFFF;
-  --surface-hover: #F9FAFB;
-  --border: #E5E7EB;
-  --border-strong: #D1D5DB;
-
-  /* Typography */
-  --font-heading: 'Poppins', sans-serif;
-  --font-body: 'Inter', sans-serif;
-
-  /* Sizing */
-  --sidebar-width: 240px;
-  --sidebar-collapsed: 64px;
-  --header-height: 64px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-pill: 100px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-
-  /* Transitions */
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration: 200ms;
-}
-
-html, body { height: 100%; overflow: hidden; }
-
-body {
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--gray-800);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-variant-numeric: tabular-nums lining-nums;
-}
-
-/* ========================================
-   LAYOUT — FULL VIEWPORT GRID
-   ======================================== */
-.dashboard {
-  display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: var(--header-height) 1fr;
-  height: 100dvh;
-  transition: grid-template-columns 0.3s var(--ease);
-}
-
-.dashboard.collapsed {
-  grid-template-columns: var(--sidebar-collapsed) 1fr;
-}
-
-/* ========================================
-   SIDEBAR
-   ======================================== */
-.sidebar {
-  grid-row: 1 / -1;
-  background: var(--gray-900);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  z-index: 20;
-  transition: width 0.3s var(--ease);
-}
-
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 18px;
-  height: var(--header-height);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  flex-shrink: 0;
-}
-
-.sidebar-logo svg {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-}
-
-.sidebar-logo-text {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  opacity: 1;
-  transition: opacity 0.2s var(--ease);
-}
-
-.dashboard.collapsed .sidebar-logo-text {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 12px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  color: var(--gray-400);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: all var(--duration) var(--ease);
-  text-decoration: none;
-  user-select: none;
-}
-
-.nav-item:hover {
-  background: rgba(255,255,255,0.06);
-  color: var(--gray-200);
-}
-
-.nav-item.active {
-  background: var(--primary);
-  color: #fff;
-}
-
-.nav-item svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.nav-item-label {
-  opacity: 1;
-  transition: opacity 0.2s var(--ease);
-}
-
-.dashboard.collapsed .nav-item-label {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-}
-
-.sidebar-collapse-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 12px;
-  margin: 8px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255,255,255,0.08);
-  background: transparent;
-  color: var(--gray-400);
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all var(--duration) var(--ease);
-}
-
-.sidebar-collapse-btn:hover {
-  background: rgba(255,255,255,0.06);
-  color: var(--gray-200);
-}
-
-.sidebar-footer {
-  padding: 12px 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  font-size: 11px;
-  color: var(--gray-500);
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.sidebar-footer a {
-  color: var(--gray-400);
-  text-decoration: none;
-  transition: color var(--duration) var(--ease);
-}
-
-.sidebar-footer a:hover { color: var(--gray-200); }
-
-/* ========================================
-   HEADER
-   ======================================== */
-.header {
-  grid-column: 2;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.header-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 18px;
-  color: var(--gray-900);
-}
-
-.header-breadcrumb {
-  font-size: 12px;
-  color: var(--gray-400);
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.header-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--gray-500);
-  padding: 6px 12px;
-  background: var(--gray-50);
-  border-radius: var(--radius-pill);
-}
-
-.header-status .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulse-dot 2s infinite;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.header-refresh-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--gray-600);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--duration) var(--ease);
-}
-
-.header-refresh-btn:hover {
-  background: var(--gray-50);
-  border-color: var(--border-strong);
-}
-
-.header-refresh-btn.spinning svg {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ========================================
-   MAIN CONTENT
-   ======================================== */
-.main {
-  grid-column: 2;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 24px;
-}
-
-/* ========================================
-   PAGE TRANSITIONS
-   ======================================== */
-.page { display: none; }
-
-.page.active {
-  display: block;
-  animation: fadeIn 0.3s var(--ease);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ========================================
-   KPI CARDS
-   ======================================== */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.kpi-card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  transition: box-shadow var(--duration) var(--ease);
-}
-
-.kpi-card:hover { box-shadow: var(--shadow-md); }
-
-.kpi-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.kpi-icon svg { width: 22px; height: 22px; }
-
-.kpi-icon.blue { background: var(--primary-light); color: var(--primary); }
-.kpi-icon.teal { background: var(--secondary-light); color: var(--secondary); }
-.kpi-icon.orange { background: var(--accent-light); color: var(--accent); }
-.kpi-icon.green { background: var(--green-light); color: var(--green); }
-
-.kpi-content { flex: 1; min-width: 0; }
-
-.kpi-value {
-  font-family: var(--font-heading);
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--gray-900);
-  line-height: 1.1;
-}
-
-.kpi-label {
-  font-size: 12px;
-  color: var(--gray-500);
-  font-weight: 500;
-  margin-top: 4px;
-}
-
-/* ========================================
-   CARD / PANEL BASE
-   ======================================== */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-}
-
-.card-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.card-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--gray-900);
-}
-
-.card-body { padding: 16px 20px; }
-
-/* ========================================
-   COMMAND CENTER LAYOUT
-   ======================================== */
-.cc-panels {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-/* Bot Status Cards */
-.bot-list { display: flex; flex-direction: column; gap: 10px; }
-
-.bot-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  transition: all var(--duration) var(--ease);
-}
-
-.bot-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-sm);
-}
-
-.bot-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.bot-status-dot.active { background: var(--green); }
-.bot-status-dot.standby { background: var(--yellow); }
-.bot-status-dot.stopped { background: var(--red); }
-.bot-status-dot.unknown { background: var(--gray-400); }
-
-.bot-info { flex: 1; min-width: 0; }
-
-.bot-name {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--gray-900);
-}
-
-.bot-provider {
-  font-size: 11px;
-  color: var(--gray-500);
-  margin-top: 2px;
-}
-
-.bot-stat {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.bot-stat-value {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--gray-800);
-}
-
-.bot-stat-label {
-  font-size: 10px;
-  color: var(--gray-400);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.bot-time {
-  font-size: 11px;
-  color: var(--gray-400);
-  flex-shrink: 0;
-}
-
-/* Quick Actions */
-.quick-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.qa-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--gray-700);
-  transition: all var(--duration) var(--ease);
-  font-family: var(--font-body);
-}
-
-.qa-btn:hover {
-  background: var(--primary-light);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.qa-btn svg { width: 20px; height: 20px; color: var(--primary); }
-
-.qa-btn.primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-
-.qa-btn.primary:hover {
-  background: var(--primary-dark);
-}
-
-.qa-btn.primary svg { color: #fff; }
-
-/* Activity Feed */
-.activity-feed { max-height: 420px; overflow-y: auto; }
-
-.activity-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--gray-100);
-}
-
-.activity-item:last-child { border-bottom: none; }
-
-.activity-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.activity-badge svg { width: 14px; height: 14px; }
-
-.activity-badge.form_submitted { background: var(--primary-light); color: var(--primary); }
-.activity-badge.email_sent { background: var(--secondary-light); color: var(--secondary); }
-.activity-badge.sms_enrolled { background: var(--accent-light); color: var(--accent); }
-.activity-badge.appointment_booked { background: var(--green-light); color: var(--green); }
-.activity-badge.status_change { background: var(--gray-100); color: var(--gray-500); }
-
-.activity-content { flex: 1; min-width: 0; }
-
-.activity-desc {
-  font-size: 13px;
-  color: var(--gray-700);
-}
-
-.activity-desc strong { font-weight: 600; color: var(--gray-900); }
-
-.activity-time {
-  font-size: 11px;
-  color: var(--gray-400);
-  margin-top: 2px;
-}
-
-/* ========================================
-   TABLES
-   ======================================== */
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: var(--radius-md);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-thead {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-thead th {
-  background: var(--gray-50);
-  padding: 10px 16px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--gray-500);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-tbody tr {
-  border-bottom: 1px solid var(--gray-100);
-  transition: background var(--duration) var(--ease);
-}
-
-tbody tr:nth-child(even) { background: var(--gray-50); }
-tbody tr:hover { background: var(--primary-light); }
-
-tbody td {
-  padding: 12px 16px;
-  color: var(--gray-700);
-  vertical-align: middle;
-}
-
-/* ========================================
-   BADGES
-   ======================================== */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.6;
-  white-space: nowrap;
-}
-
-.badge-new { background: var(--primary-light); color: var(--primary); }
-.badge-contacted { background: var(--secondary-light); color: var(--secondary); }
-.badge-qualified { background: var(--green-light); color: var(--green); }
-.badge-proposal { background: var(--orange-light); color: var(--orange); }
-.badge-won { background: var(--green-light); color: var(--green); }
-.badge-lost { background: var(--red-light); color: var(--red); }
-.badge-booked { background: var(--primary-light); color: var(--primary); }
-.badge-confirmed { background: var(--green-light); color: var(--green); }
-.badge-completed { background: var(--gray-100); color: var(--gray-600); }
-.badge-cancelled { background: var(--red-light); color: var(--red); }
-.badge-sent { background: var(--green-light); color: var(--green); }
-.badge-failed { background: var(--red-light); color: var(--red); }
-.badge-pending { background: var(--yellow-light); color: #92400E; }
-.badge-delivered { background: var(--green-light); color: var(--green); }
-.badge-active { background: var(--green-light); color: var(--green); }
-.badge-inactive { background: var(--gray-100); color: var(--gray-500); }
-
-/* Score badges */
-.badge-hot { background: var(--red-light); color: var(--red); }
-.badge-warm { background: var(--orange-light); color: var(--orange); }
-.badge-cold { background: var(--primary-light); color: var(--primary); }
-
-/* Priority badges */
-.badge-urgent { background: var(--red-light); color: var(--red); }
-.badge-high { background: var(--orange-light); color: var(--orange); }
-.badge-medium { background: var(--primary-light); color: var(--primary); }
-.badge-low { background: var(--gray-100); color: var(--gray-500); }
-
-/* ========================================
-   FORMS
-   ======================================== */
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-group label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-600);
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--gray-800);
-  background: var(--surface);
-  transition: all var(--duration) var(--ease);
-  outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.form-group textarea { resize: vertical; min-height: 80px; }
-
-/* ========================================
-   BUTTONS
-   ======================================== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all var(--duration) var(--ease);
-  white-space: nowrap;
-}
-
-.btn svg { width: 16px; height: 16px; }
-
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-
-.btn-primary:hover { background: var(--primary-dark); }
-
-.btn-secondary {
-  background: var(--surface);
-  color: var(--gray-700);
-  border-color: var(--border);
-}
-
-.btn-secondary:hover {
-  background: var(--gray-50);
-  border-color: var(--border-strong);
-}
-
-.btn-danger {
-  background: var(--red-light);
-  color: var(--red);
-  border-color: transparent;
-}
-
-.btn-danger:hover { background: #FECACA; }
-
-.btn-sm {
-  padding: 4px 10px;
-  font-size: 12px;
-}
-
-.btn-icon {
-  padding: 6px;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--gray-400);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--duration) var(--ease);
-}
-
-.btn-icon:hover {
-  color: var(--gray-700);
-  background: var(--gray-100);
-}
-
-.btn:disabled, .btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ========================================
-   SEARCH & FILTERS
-   ======================================== */
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  flex: 1;
-  max-width: 360px;
-  transition: all var(--duration) var(--ease);
-}
-
-.search-box:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.search-box svg { width: 16px; height: 16px; color: var(--gray-400); flex-shrink: 0; }
-
-.search-box input {
-  border: none;
-  outline: none;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--gray-800);
-  width: 100%;
-  background: transparent;
-}
-
-.filter-select {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--gray-700);
-  background: var(--surface);
-  cursor: pointer;
-  outline: none;
-  transition: all var(--duration) var(--ease);
-}
-
-.filter-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-/* ========================================
-   KANBAN BOARD
-   ======================================== */
-.kanban {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  min-height: 400px;
-}
-
-.kanban-col {
-  background: var(--gray-50);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.kanban-col-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--border);
-}
-
-.kanban-col-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--gray-700);
-}
-
-.kanban-col-count {
-  background: var(--gray-200);
-  color: var(--gray-600);
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-}
-
-.kanban-col.todo .kanban-col-header { border-bottom-color: var(--primary); }
-.kanban-col.in-progress .kanban-col-header { border-bottom-color: var(--accent); }
-.kanban-col.done .kanban-col-header { border-bottom-color: var(--green); }
-
-.kanban-cards {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  max-height: calc(100vh - 380px);
-}
-
-.task-card {
-  background: var(--surface);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: all var(--duration) var(--ease);
-}
-
-.task-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-strong);
-}
-
-.task-card-title {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--gray-900);
-  margin-bottom: 8px;
-}
-
-.task-card-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.task-card-due {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--gray-500);
-}
-
-.task-card-due svg { width: 12px; height: 12px; }
-
-.task-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--gray-100);
-}
-
-.task-card-lead {
-  font-size: 11px;
-  color: var(--gray-500);
-  margin-top: 4px;
-}
-
-/* ========================================
-   LEAD DETAIL PANEL (SLIDE-IN)
-   ======================================== */
-.detail-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 50;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s var(--ease);
-}
-
-.detail-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.detail-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 480px;
-  height: 100%;
-  background: var(--surface);
-  z-index: 51;
-  transform: translateX(100%);
-  transition: transform 0.3s var(--ease);
-  display: flex;
-  flex-direction: column;
-  box-shadow: -4px 0 24px rgba(0,0,0,0.1);
-}
-
-.detail-panel.open { transform: translateX(0); }
-
-.detail-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-
-.detail-header-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 18px;
-  color: var(--gray-900);
-}
-
-.detail-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.detail-section {
-  margin-bottom: 24px;
-}
-
-.detail-section-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-}
-
-.detail-field {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--gray-100);
-}
-
-.detail-field-label { font-size: 13px; color: var(--gray-500); }
-.detail-field-value { font-size: 13px; color: var(--gray-800); font-weight: 500; }
-
-/* Timeline */
-.timeline { position: relative; padding-left: 24px; }
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 4px;
-  bottom: 4px;
-  width: 2px;
-  background: var(--gray-200);
-}
-
-.timeline-item {
-  position: relative;
-  padding-bottom: 16px;
-}
-
-.timeline-item::before {
-  content: '';
-  position: absolute;
-  left: -21px;
-  top: 4px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid var(--surface);
-}
-
-.timeline-item-desc { font-size: 13px; color: var(--gray-700); }
-.timeline-item-time { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-
-/* ========================================
-   CALENDAR VIEW
-   ======================================== */
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.calendar-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.calendar-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--gray-900);
-  min-width: 200px;
-  text-align: center;
-}
-
-.view-toggle {
-  display: flex;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.view-toggle-btn {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--surface);
-  border: none;
-  cursor: pointer;
-  color: var(--gray-600);
-  font-family: var(--font-body);
-  transition: all var(--duration) var(--ease);
-}
-
-.view-toggle-btn.active {
-  background: var(--primary);
-  color: #fff;
-}
-
-.view-toggle-btn:not(:last-child) { border-right: 1px solid var(--border); }
-
-.week-grid {
-  display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.week-grid-header {
-  background: var(--gray-50);
-  padding: 10px 8px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-}
-
-.week-grid-header:first-child { border-right: 1px solid var(--border); }
-
-.week-time {
-  padding: 4px 8px;
-  font-size: 10px;
-  color: var(--gray-400);
-  text-align: right;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--gray-100);
-  height: 48px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-}
-
-.week-cell {
-  border-right: 1px solid var(--gray-100);
-  border-bottom: 1px solid var(--gray-100);
-  height: 48px;
-  padding: 2px;
-  position: relative;
-}
-
-.week-cell:last-child { border-right: none; }
-
-.cal-event {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  line-height: 1.4;
-}
-
-.cal-event.kitchen_guard { background: var(--primary-light); color: var(--primary); }
-.cal-event.home_shield { background: var(--secondary-light); color: var(--secondary); }
-.cal-event.pure_life { background: var(--accent-light); color: var(--accent); }
-.cal-event.consultation { background: var(--green-light); color: var(--green); }
-.cal-event.default { background: var(--gray-100); color: var(--gray-600); }
-
-/* ========================================
-   TABS
-   ======================================== */
-.tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  padding: 10px 20px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--gray-500);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  transition: all var(--duration) var(--ease);
-}
-
-.tab-btn:hover { color: var(--gray-700); }
-
-.tab-btn.active {
-  color: var(--primary);
-}
-
-.tab-btn.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--primary);
-  border-radius: 2px 2px 0 0;
-}
-
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* ========================================
-   BOT MANAGEMENT CARDS (FULL)
-   ======================================== */
-.bot-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
-}
-
-.bot-full-card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-  transition: all var(--duration) var(--ease);
-}
-
-.bot-full-card:hover { box-shadow: var(--shadow-md); }
-
-.bot-full-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.bot-full-status {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.bot-full-status.active { background: var(--green); box-shadow: 0 0 8px rgba(22,163,74,0.4); }
-.bot-full-status.standby { background: var(--yellow); box-shadow: 0 0 8px rgba(234,179,8,0.4); }
-.bot-full-status.stopped { background: var(--red); box-shadow: 0 0 8px rgba(220,38,38,0.4); }
-
-.bot-full-name {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--gray-900);
-}
-
-.bot-full-provider {
-  font-size: 12px;
-  color: var(--gray-500);
-  margin-left: auto;
-  padding: 2px 10px;
-  background: var(--gray-100);
-  border-radius: var(--radius-pill);
-}
-
-.bot-full-desc {
-  font-size: 13px;
-  color: var(--gray-600);
-  margin-bottom: 16px;
-  line-height: 1.6;
-}
-
-.bot-full-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.bot-full-stat {
-  background: var(--gray-50);
-  padding: 12px;
-  border-radius: var(--radius-md);
-}
-
-.bot-full-stat-value {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--gray-900);
-}
-
-.bot-full-stat-label {
-  font-size: 11px;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.bot-full-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid var(--gray-100);
-  font-size: 11px;
-  color: var(--gray-400);
-}
-
-/* Jobs list for scheduler bot */
-.job-list {
-  margin-top: 12px;
-}
-
-.job-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--gray-50);
-  border-radius: var(--radius-sm);
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.job-name { color: var(--gray-700); font-weight: 500; }
-.job-next-run { color: var(--gray-400); }
-
-/* ========================================
-   SETTINGS PAGE
-   ======================================== */
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 20px;
-}
-
-.settings-section {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-}
-
-.settings-section-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--gray-900);
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.settings-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--gray-100);
-}
-
-.settings-row:last-child { border-bottom: none; }
-
-.settings-label { font-size: 13px; color: var(--gray-500); }
-
-.settings-value {
-  font-size: 13px;
-  color: var(--gray-800);
-  font-weight: 500;
-  text-align: right;
-}
-
-.settings-value code {
-  background: var(--gray-100);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-}
-
-/* ========================================
-   SKELETON LOADERS
-   ======================================== */
-.skeleton {
-  background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite;
-  border-radius: var(--radius-sm);
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.skeleton-text { height: 14px; margin-bottom: 8px; }
-.skeleton-text.sm { width: 60%; }
-.skeleton-text.lg { width: 90%; }
-.skeleton-block { height: 60px; margin-bottom: 10px; border-radius: var(--radius-md); }
-.skeleton-kpi { height: 88px; border-radius: var(--radius-lg); }
-
-/* ========================================
-   EMPTY STATES
-   ======================================== */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  text-align: center;
-}
-
-.empty-state svg {
-  width: 48px;
-  height: 48px;
-  color: var(--gray-300);
-  margin-bottom: 16px;
-}
-
-.empty-state-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--gray-700);
-  margin-bottom: 4px;
-}
-
-.empty-state-desc {
-  font-size: 13px;
-  color: var(--gray-400);
-  max-width: 320px;
-}
-
-/* ========================================
-   INLINE FORMS (MODALS)
-   ======================================== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 100;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-overlay.open { display: flex; }
-
-.modal {
-  background: var(--surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  padding: 20px 24px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modal-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 18px;
-  color: var(--gray-900);
-}
-
-.modal-body { padding: 20px 24px; }
-
-.modal-footer {
-  padding: 0 24px 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-@media (max-width: 1024px) {
-  .kpi-row {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .cc-panels {
-    grid-template-columns: 1fr;
-  }
-  .kanban {
-    grid-template-columns: 1fr;
-  }
-  .dashboard {
-    grid-template-columns: var(--sidebar-collapsed) 1fr;
-  }
-  .sidebar-logo-text, .nav-item-label {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-  }
-}
-
-@media (max-width: 768px) {
-  .kpi-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .bot-grid {
-    grid-template-columns: 1fr;
-  }
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
-  .week-grid {
-    grid-template-columns: 40px repeat(7, 1fr);
-  }
-  .detail-panel { width: 100%; }
-  .main { padding: 16px; }
-}
-</style>
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-
-<div class="dashboard" id="dashboard">
-  <!-- SIDEBAR -->
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CrystalFlow Logo">
-        <rect width="32" height="32" rx="8" fill="#0066CC"/>
-        <path d="M16 6L22 11L19 16L22 21L16 26L10 21L13 16L10 11L16 6Z" fill="white" opacity="0.9"/>
-        <path d="M16 10L19 13.5L16 17L13 13.5L16 10Z" fill="#00A5A8"/>
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="8" fill="url(#logo-grad)"/>
+        <path d="M10 18C10 13.58 13.58 10 18 10C18 14.42 21.58 18 26 18C26 22.42 22.42 26 18 26C18 21.58 14.42 18 10 18Z" fill="white" opacity="0.9"/>
+        <circle cx="18" cy="18" r="3" fill="white"/>
+        <defs>
+          <linearGradient id="logo-grad" x1="0" y1="0" x2="36" y2="36">
+            <stop stop-color="#E8439A"/>
+            <stop offset="0.5" stop-color="#5B6BF5"/>
+            <stop offset="1" stop-color="#00C9DB"/>
+          </linearGradient>
+        </defs>
       </svg>
-      <span class="sidebar-logo-text">CrystalFlow</span>
+      <div>
+        <div class="sidebar-logo-text">CrystalFlow</div>
+        <div class="sidebar-logo-sub">Command Center</div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
-      <a class="nav-item active" data-page="command-center" onclick="navigate('command-center')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span class="nav-item-label">Command Center</span>
+      <div class="sidebar-section-label">Overview</div>
+      <a class="nav-item active" data-view="dashboard" href="#dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
       </a>
-      <a class="nav-item" data-page="tasks" onclick="navigate('tasks')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <span class="nav-item-label">Tasks</span>
+      <a class="nav-item" data-view="quote" href="#quote">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Quote Calculator
       </a>
-      <a class="nav-item" data-page="leads" onclick="navigate('leads')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        <span class="nav-item-label">Leads</span>
+
+      <div class="sidebar-section-label">Manage</div>
+      <a class="nav-item" data-view="portal" href="#portal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Customer Portal
+        <span class="nav-badge">3</span>
       </a>
-      <a class="nav-item" data-page="appointments" onclick="navigate('appointments')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span class="nav-item-label">Appointments</span>
+      <a class="nav-item" data-view="dispatch" href="#dispatch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
+        Dispatch
+        <span class="nav-badge">5</span>
       </a>
-      <a class="nav-item" data-page="messages" onclick="navigate('messages')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <span class="nav-item-label">Messages</span>
+
+      <div class="sidebar-section-label">Tools</div>
+      <a class="nav-item" data-view="automations" href="#automations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z"/></svg>
+        Automations
+        <span class="nav-badge">8</span>
       </a>
-      <a class="nav-item" data-page="bots" onclick="navigate('bots')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <span class="nav-item-label">Bots</span>
+      <a class="nav-item" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+        Email Campaigns
       </a>
-      <a class="nav-item" data-page="settings" onclick="navigate('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        <span class="nav-item-label">Settings</span>
+      <a class="nav-item" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        SMS Drips
+      </a>
+      <a class="nav-item" href="#" onclick="return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
       </a>
     </nav>
 
-    <button class="sidebar-collapse-btn" onclick="toggleSidebar()">
-      <svg id="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
-    </button>
-
     <div class="sidebar-footer">
-      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+      <div class="avatar">IP</div>
+      <div>
+        <div class="sidebar-user-name">Isaiah Pacheco</div>
+        <div class="sidebar-user-role">Owner</div>
+      </div>
     </div>
   </aside>
 
-  <!-- HEADER -->
+  <!-- ===== HEADER ===== -->
   <header class="header">
-    <div class="header-left">
-      <h1 class="header-title" id="header-title">Command Center</h1>
-      <span class="header-breadcrumb" id="header-breadcrumb">CrystalFlow Miami</span>
-    </div>
-    <div class="header-right">
-      <div class="header-status">
-        <span class="dot"></span>
-        <span>API Connected</span>
+    <h1 class="header-title" id="pageTitle">Analytics Dashboard</h1>
+    <div class="header-actions">
+      <div class="header-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search leads, jobs...">
       </div>
-      <button class="header-refresh-btn" id="refresh-btn" onclick="refreshCurrentPage()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-        Refresh
+      <button class="btn-icon" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
       </button>
+      <button class="btn btn-primary" id="headerCTA">+ New Lead</button>
     </div>
   </header>
 
-  <!-- MAIN CONTENT AREA -->
-  <main class="main" id="main-content">
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main">
 
-    <!-- ========================================
-         PAGE 1: COMMAND CENTER
-         ======================================== -->
-    <div class="page active" id="page-command-center">
-      <!-- KPI Row -->
-      <div class="kpi-row" id="kpi-row">
-        <div class="kpi-card">
-          <div class="kpi-icon blue">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-          </div>
-          <div class="kpi-content">
-            <div class="kpi-value" id="kpi-leads">--</div>
-            <div class="kpi-label">Total Leads</div>
+    <!-- ============================== -->
+    <!-- VIEW: ANALYTICS DASHBOARD      -->
+    <!-- ============================== -->
+    <section class="view active" id="view-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi-card accent-cyan">
+          <div class="kpi-label">Revenue (MTD)</div>
+          <div class="kpi-value" data-count="47850">$0</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
+            23% vs last month
           </div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-icon teal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-          </div>
-          <div class="kpi-content">
-            <div class="kpi-value" id="kpi-tasks">--</div>
-            <div class="kpi-label">Active Tasks</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon green">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <div class="kpi-content">
-            <div class="kpi-value" id="kpi-appointments">--</div>
-            <div class="kpi-label">Upcoming Appts</div>
+        <div class="kpi-card accent-pink">
+          <div class="kpi-label">Active Leads</div>
+          <div class="kpi-value" data-count="34">0</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
+            12 new this week
           </div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-icon teal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div class="kpi-content">
-            <div class="kpi-value" id="kpi-emails">--</div>
-            <div class="kpi-label">Emails Sent</div>
+        <div class="kpi-card accent-violet">
+          <div class="kpi-label">Conversion Rate</div>
+          <div class="kpi-value" data-count="38" data-suffix="%">0%</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
+            5% vs last month
           </div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-icon orange">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          </div>
-          <div class="kpi-content">
-            <div class="kpi-value" id="kpi-sms">--</div>
-            <div class="kpi-label">SMS Sent</div>
+        <div class="kpi-card accent-success">
+          <div class="kpi-label">Installs Completed</div>
+          <div class="kpi-value" data-count="12">0</div>
+          <div class="kpi-delta up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
+            3 this week
           </div>
         </div>
       </div>
 
-      <!-- Bot Status + Quick Actions -->
-      <div class="cc-panels">
-        <!-- Bot Status Panel -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Bot Status</span>
-            <button class="btn btn-sm btn-secondary" onclick="navigate('bots')">View All</button>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-card-title">Revenue Trend</div>
+              <div class="chart-card-subtitle">Last 6 months</div>
+            </div>
+            <button class="btn btn-secondary" style="font-size: var(--text-xs);">Export</button>
           </div>
-          <div class="card-body">
-            <div class="bot-list" id="bot-status-list">
-              <div class="skeleton skeleton-block"></div>
-              <div class="skeleton skeleton-block"></div>
-              <div class="skeleton skeleton-block"></div>
+          <div class="chart-wrapper"><canvas id="revenueChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-card-title">Lead Sources</div>
+              <div class="chart-card-subtitle">This month</div>
             </div>
           </div>
+          <div class="chart-wrapper"><canvas id="sourcesChart"></canvas></div>
         </div>
+      </div>
 
-        <!-- Quick Actions Panel -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Quick Actions</span>
-          </div>
-          <div class="card-body">
-            <div class="quick-actions">
-              <button class="qa-btn primary" onclick="openModal('task-modal')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New Task
-              </button>
-              <button class="qa-btn" onclick="openModal('lead-modal')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                Add Lead
-              </button>
-              <button class="qa-btn" onclick="navigate('leads')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                View All Leads
-              </button>
-              <button class="qa-btn" onclick="navigate('appointments')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Check Appointments
-              </button>
-              <button class="qa-btn" onclick="runSeoAudit()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Run SEO Audit
-              </button>
-              <button class="qa-btn" onclick="viewSeoReport()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                SEO Report
-              </button>
-              <button class="qa-btn" onclick="viewKeywordTracker()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Keyword Tracker
-              </button>
-              <button class="qa-btn" onclick="window.open('https://manychat.com/apps/4506033/ig-ai-skills','_blank')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-                ManyChat AI
-              </button>
-              <button class="qa-btn" onclick="window.open('https://app.intercom.com','_blank')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                Intercom Inbox
-              </button>
-              <button class="qa-btn" onclick="window.open('https://dashboard.stripe.com','_blank')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                Stripe Dashboard
-              </button>
-              <button class="qa-btn" onclick="window.open('https://analytics.google.com','_blank')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                Google Analytics
-              </button>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-card-title">Pipeline Funnel</div>
+              <div class="chart-card-subtitle">Current active leads</div>
             </div>
           </div>
+          <div class="chart-wrapper"><canvas id="funnelChart"></canvas></div>
         </div>
-      </div>
-
-      <!-- Activity Feed -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Recent Activity</span>
-          <span style="font-size:11px;color:var(--gray-400)" id="activity-updated"></span>
-        </div>
-        <div class="card-body">
-          <div class="activity-feed" id="activity-feed">
-            <div class="skeleton skeleton-block"></div>
-            <div class="skeleton skeleton-block"></div>
-            <div class="skeleton skeleton-block"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================================
-         PAGE 2: TASKS
-         ======================================== -->
-    <div class="page" id="page-tasks">
-      <!-- Add Task Form -->
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-header">
-          <span class="card-title">Add New Task</span>
-        </div>
-        <div class="card-body">
-          <form id="task-form" onsubmit="handleTaskSubmit(event)">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Title *</label>
-                <input type="text" id="task-title" required placeholder="Task title">
-              </div>
-              <div class="form-group">
-                <label>Priority</label>
-                <select id="task-priority">
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Category</label>
-                <select id="task-category">
-                  <option value="general">General</option>
-                  <option value="follow_up">Follow Up</option>
-                  <option value="installation">Installation</option>
-                  <option value="consultation">Consultation</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-card-title">Package Mix</div>
+              <div class="chart-card-subtitle">Revenue by tier</div>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Description</label>
-                <textarea id="task-desc" placeholder="Task description (optional)"></textarea>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Due Date</label>
-                <input type="date" id="task-due">
-              </div>
-              <div class="form-group">
-                <label>Linked Lead</label>
-                <select id="task-lead">
-                  <option value="">None</option>
-                </select>
-              </div>
-              <div class="form-group" style="justify-content:flex-end">
-                <button type="submit" class="btn btn-primary" id="task-submit-btn">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  Add Task
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="toolbar">
-        <select class="filter-select" id="task-filter-priority" onchange="renderTasks()">
-          <option value="">All Priorities</option>
-          <option value="urgent">Urgent</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
-        <select class="filter-select" id="task-filter-category" onchange="renderTasks()">
-          <option value="">All Categories</option>
-          <option value="general">General</option>
-          <option value="follow_up">Follow Up</option>
-          <option value="installation">Installation</option>
-          <option value="consultation">Consultation</option>
-          <option value="admin">Admin</option>
-        </select>
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray-600);cursor:pointer">
-          <input type="checkbox" id="task-show-done" onchange="renderTasks()"> Show completed
-        </label>
-      </div>
-
-      <!-- Kanban Board -->
-      <div class="kanban" id="kanban-board">
-        <div class="kanban-col todo">
-          <div class="kanban-col-header">
-            <span class="kanban-col-title">To Do</span>
-            <span class="kanban-col-count" id="count-todo">0</span>
           </div>
-          <div class="kanban-cards" id="col-todo"></div>
-        </div>
-        <div class="kanban-col in-progress">
-          <div class="kanban-col-header">
-            <span class="kanban-col-title">In Progress</span>
-            <span class="kanban-col-count" id="count-in-progress">0</span>
-          </div>
-          <div class="kanban-cards" id="col-in-progress"></div>
-        </div>
-        <div class="kanban-col done">
-          <div class="kanban-col-header">
-            <span class="kanban-col-title">Done</span>
-            <span class="kanban-col-count" id="count-done">0</span>
-          </div>
-          <div class="kanban-cards" id="col-done"></div>
+          <div class="chart-wrapper"><canvas id="packageChart"></canvas></div>
         </div>
       </div>
-    </div>
 
-    <!-- ========================================
-         PAGE 3: LEADS
-         ======================================== -->
-    <div class="page" id="page-leads">
-      <div class="toolbar">
-        <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="lead-search" placeholder="Search leads..." oninput="renderLeads()">
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="table-card-title">Recent Leads</div>
+          <button class="btn btn-secondary" style="font-size: var(--text-xs);">View All</button>
         </div>
-        <select class="filter-select" id="lead-status-filter" onchange="renderLeads()">
-          <option value="">All Statuses</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="qualified">Qualified</option>
-          <option value="proposal">Proposal</option>
-          <option value="won">Won</option>
-          <option value="lost">Lost</option>
-        </select>
-        <select class="filter-select" id="lead-score-filter" onchange="renderLeads()">
-          <option value="">All Scores</option>
-          <option value="hot">Hot</option>
-          <option value="warm">Warm</option>
-          <option value="cold">Cold</option>
-        </select>
-      </div>
-
-      <div class="card">
-        <div class="table-wrapper">
-          <table>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Score</th>
-                <th>Package Interest</th>
+                <th>Package</th>
+                <th>Zip</th>
                 <th>Source</th>
-                <th>Created</th>
+                <th>Status</th>
+                <th>Value</th>
+                <th>Date</th>
               </tr>
             </thead>
-            <tbody id="leads-table-body">
-              <tr><td colspan="8"><div class="skeleton skeleton-text lg"></div><div class="skeleton skeleton-text sm"></div></td></tr>
+            <tbody>
+              <tr><td>Maria Santos</td><td>Pure Life</td><td>33139</td><td>Google</td><td><span class="badge badge-qualified">Qualified</span></td><td>$2,899</td><td>Mar 9</td></tr>
+              <tr><td>James Rodriguez</td><td>Home Shield</td><td>33131</td><td>Instagram</td><td><span class="badge badge-contacted">Contacted</span></td><td>$1,999</td><td>Mar 9</td></tr>
+              <tr><td>Nicole Thompson</td><td>Kitchen Guard</td><td>33125</td><td>Referral</td><td><span class="badge badge-new">New</span></td><td>$749</td><td>Mar 8</td></tr>
+              <tr><td>David Kim</td><td>Home Shield</td><td>33133</td><td>Google</td><td><span class="badge badge-quoted">Quoted</span></td><td>$2,199</td><td>Mar 8</td></tr>
+              <tr><td>Ashley Williams</td><td>Pure Life</td><td>33137</td><td>Facebook</td><td><span class="badge badge-won">Won</span></td><td>$3,199</td><td>Mar 7</td></tr>
+              <tr><td>Carlos Diaz</td><td>Kitchen Guard</td><td>33126</td><td>Intercom</td><td><span class="badge badge-new">New</span></td><td>$849</td><td>Mar 7</td></tr>
+              <tr><td>Sophie Chen</td><td>Home Shield</td><td>33141</td><td>Google</td><td><span class="badge badge-won">Won</span></td><td>$1,799</td><td>Mar 6</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Lead Detail Panel -->
-    <div class="detail-overlay" id="lead-detail-overlay" onclick="closeLeadDetail()"></div>
-    <div class="detail-panel" id="lead-detail-panel">
-      <div class="detail-header">
-        <span class="detail-header-title" id="lead-detail-name">Lead Detail</span>
-        <button class="btn-icon" onclick="closeLeadDetail()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="detail-body" id="lead-detail-body"></div>
-    </div>
+    <!-- ============================== -->
+    <!-- VIEW: INSTANT QUOTE CALCULATOR -->
+    <!-- ============================== -->
+    <section class="view" id="view-quote">
+      <div class="quote-container">
+        <div class="quote-form">
+          <h2 style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-6); color: var(--color-text);">Build Your Quote</h2>
 
-    <!-- ========================================
-         PAGE 4: APPOINTMENTS
-         ======================================== -->
-    <div class="page" id="page-appointments">
-      <div class="calendar-header">
-        <div class="calendar-nav">
-          <button class="btn btn-sm btn-secondary" onclick="changeWeek(-1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <span class="calendar-title" id="calendar-title">Week of Mar 8, 2026</span>
-          <button class="btn btn-sm btn-secondary" onclick="changeWeek(1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
+          <div class="form-group">
+            <label class="form-label">Select Package</label>
+            <div class="form-radio-group" id="packageSelect">
+              <label class="form-radio-card selected" data-package="kitchen">
+                <input type="radio" name="package" value="kitchen" checked>
+                <div class="radio-card-icon">🚰</div>
+                <span class="radio-card-label">Kitchen Guard</span>
+                <span class="radio-card-desc">Under-sink RO</span>
+              </label>
+              <label class="form-radio-card" data-package="home">
+                <input type="radio" name="package" value="home">
+                <div class="radio-card-icon">🏠</div>
+                <span class="radio-card-label">Home Shield</span>
+                <span class="radio-card-desc">Whole kitchen</span>
+              </label>
+              <label class="form-radio-card" data-package="pure">
+                <input type="radio" name="package" value="pure">
+                <div class="radio-card-icon">💎</div>
+                <span class="radio-card-label">Pure Life</span>
+                <span class="radio-card-desc">Full home system</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Home Type</label>
+            <select class="form-select" id="homeType">
+              <option value="apartment">Apartment / Condo</option>
+              <option value="townhouse">Townhouse</option>
+              <option value="house-small" selected>House (under 2,000 sqft)</option>
+              <option value="house-large">House (2,000+ sqft)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Number of Bathrooms</label>
+            <select class="form-select" id="bathrooms">
+              <option value="1">1 Bathroom</option>
+              <option value="2" selected>2 Bathrooms</option>
+              <option value="3">3 Bathrooms</option>
+              <option value="4">4+ Bathrooms</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Zip Code</label>
+            <input class="form-input" type="text" id="zipCode" placeholder="e.g. 33139" value="33139" maxlength="5">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Add-Ons</label>
+            <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+              <label style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--color-surface-2); border-radius: var(--radius-md); cursor: pointer; font-size: var(--text-sm);">
+                <input type="checkbox" id="addonWarranty" style="accent-color: var(--color-cyan);"> Extended warranty (2 yr) — $149
+              </label>
+              <label style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--color-surface-2); border-radius: var(--radius-md); cursor: pointer; font-size: var(--text-sm);">
+                <input type="checkbox" id="addonFilter" style="accent-color: var(--color-cyan);"> Filter subscription (12 mo) — $99
+              </label>
+              <label style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--color-surface-2); border-radius: var(--radius-md); cursor: pointer; font-size: var(--text-sm);">
+                <input type="checkbox" id="addonRush" style="accent-color: var(--color-cyan);"> Rush install (48hr) — $199
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Customer Name</label>
+            <input class="form-input" type="text" id="custName" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" type="tel" id="custPhone" placeholder="(786) 555-0123">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="custEmail" placeholder="name@email.com">
+          </div>
         </div>
-        <div class="view-toggle">
-          <button class="view-toggle-btn active" id="cal-view-btn" onclick="switchApptView('calendar')">Calendar</button>
-          <button class="view-toggle-btn" id="list-view-btn" onclick="switchApptView('list')">List</button>
+
+        <div class="quote-summary">
+          <div class="quote-summary-header">
+            <div class="quote-summary-title" id="quotePkgName">Kitchen Guard</div>
+            <div class="quote-summary-subtitle">Waterdrop G5P500A — 500 GPD</div>
+          </div>
+          <div class="quote-summary-body">
+            <div class="quote-line-item">
+              <span class="quote-line-label">Base Price</span>
+              <span class="quote-line-value" id="quoteBase">$699</span>
+            </div>
+            <div class="quote-line-item">
+              <span class="quote-line-label">Home Adjustment</span>
+              <span class="quote-line-value" id="quoteHome">$0</span>
+            </div>
+            <div class="quote-line-item">
+              <span class="quote-line-label">Area Surcharge</span>
+              <span class="quote-line-value" id="quoteArea">$0</span>
+            </div>
+            <div class="quote-line-item" id="addonWarrantyLine" style="display:none;">
+              <span class="quote-line-label">Extended Warranty</span>
+              <span class="quote-line-value">$149</span>
+            </div>
+            <div class="quote-line-item" id="addonFilterLine" style="display:none;">
+              <span class="quote-line-label">Filter Subscription</span>
+              <span class="quote-line-value">$99</span>
+            </div>
+            <div class="quote-line-item" id="addonRushLine" style="display:none;">
+              <span class="quote-line-label">Rush Install</span>
+              <span class="quote-line-value">$199</span>
+            </div>
+          </div>
+          <div class="quote-total">
+            <span class="quote-total-label">Total Estimate</span>
+            <span class="quote-total-value" id="quoteTotal">$699</span>
+          </div>
+          <div class="quote-actions">
+            <button class="btn btn-primary" onclick="alert('Quote sent to customer!')">Send Quote</button>
+            <button class="btn btn-secondary" onclick="alert('Quote saved as PDF!')">Save PDF</button>
+          </div>
+          <div class="quote-actions" style="border-top: 1px solid var(--color-border-subtle);">
+            <button class="btn btn-pink" id="payDepositBtn">Pay Deposit</button>
+            <button class="btn btn-secondary" id="shareQuoteBtn">Share Quote Link</button>
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- Calendar View -->
-      <div id="calendar-view" class="card" style="overflow:auto">
-        <div class="week-grid" id="week-grid"></div>
-      </div>
+    <!-- ============================== -->
+    <!-- VIEW: CUSTOMER PORTAL          -->
+    <!-- ============================== -->
+    <section class="view" id="view-portal">
+      <div class="portal-grid">
+        <div class="customer-profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar">MS</div>
+            <div class="profile-name">Maria Santos</div>
+            <div class="profile-email">maria.santos@gmail.com</div>
+          </div>
+          <div class="profile-body">
+            <div class="profile-info-row">
+              <span class="profile-info-label">Phone</span>
+              <span class="profile-info-value">(305) 555-0142</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="profile-info-label">Address</span>
+              <span class="profile-info-value">1842 Brickell Ave, 33139</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="profile-info-label">Package</span>
+              <span class="profile-info-value" style="color: var(--color-cyan);">Pure Life</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="profile-info-label">Install Date</span>
+              <span class="profile-info-value">Feb 14, 2026</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="profile-info-label">Lifetime Value</span>
+              <span class="profile-info-value" style="color: var(--color-success);">$3,447</span>
+            </div>
+            <div class="profile-info-row">
+              <span class="profile-info-label">Lead Score</span>
+              <span class="profile-info-value">92 / 100</span>
+            </div>
+          </div>
+        </div>
 
-      <!-- List View -->
-      <div id="list-view" class="card" style="display:none">
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Lead Name</th>
-                <th>Service Type</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="appt-list-body"></tbody>
-          </table>
+        <div class="portal-content">
+          <div class="portal-tabs">
+            <button class="portal-tab active" data-portal-tab="activity">Activity</button>
+            <button class="portal-tab" data-portal-tab="invoices">Invoices</button>
+            <button class="portal-tab" data-portal-tab="warranty">Warranty</button>
+            <button class="portal-tab" data-portal-tab="service">Service</button>
+          </div>
+
+          <!-- Activity Tab -->
+          <div class="portal-tab-content active" id="portal-activity">
+            <div class="chart-card">
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-dot cyan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Installation Completed</div>
+                    <div class="timeline-desc">Pure Life system installed by Marco R. — Customer rated 5 stars</div>
+                    <div class="timeline-time">Feb 14, 2026 — 2:30 PM</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot success">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Payment Received — $2,899</div>
+                    <div class="timeline-desc">Deposit + final payment via Stripe. Invoice #CF-1042</div>
+                    <div class="timeline-time">Feb 14, 2026 — 3:15 PM</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot pink">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Quote Sent — Pure Life Package</div>
+                    <div class="timeline-desc">Sent via email. Opened 3 times before accepting</div>
+                    <div class="timeline-time">Feb 10, 2026 — 11:20 AM</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot violet">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Water Test Consultation</div>
+                    <div class="timeline-desc">In-home visit. TDS reading: 380 ppm. Recommended Pure Life package</div>
+                    <div class="timeline-time">Feb 8, 2026 — 10:00 AM</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot cyan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Lead Created</div>
+                    <div class="timeline-desc">Source: Google Ads — searched "water softener miami beach"</div>
+                    <div class="timeline-time">Feb 5, 2026 — 9:12 AM</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invoices Tab -->
+          <div class="portal-tab-content" id="portal-invoices">
+            <div class="table-card">
+              <div style="overflow-x: auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Invoice</th><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>#CF-1042</td><td>Feb 14, 2026</td><td>Pure Life Installation — Final Payment</td><td>$1,449.50</td><td><span class="badge badge-completed">Paid</span></td></tr>
+                    <tr><td>#CF-1041</td><td>Feb 10, 2026</td><td>Pure Life Installation — 50% Deposit</td><td>$1,449.50</td><td><span class="badge badge-completed">Paid</span></td></tr>
+                    <tr><td>#CF-1056</td><td>Mar 8, 2026</td><td>Extended Warranty — Platinum (2yr)</td><td>$149.00</td><td><span class="badge badge-completed">Paid</span></td></tr>
+                    <tr><td>#CF-1070</td><td>Mar 14, 2026</td><td>Filter Subscription — 6-Month</td><td>$99.00</td><td><span class="badge badge-pending">Upcoming</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warranty Tab -->
+          <div class="portal-tab-content" id="portal-warranty">
+            <div class="warranty-card">
+              <div class="warranty-header">
+                <div class="warranty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <div class="warranty-title">Platinum Extended Warranty</div>
+                  <div class="warranty-subtitle">Pure Life — Waterdrop X16 (1600 GPD)</div>
+                </div>
+              </div>
+              <div class="warranty-progress">
+                <div class="warranty-progress-bar" style="width: 4%;"></div>
+              </div>
+              <div class="warranty-dates">
+                <span>Start: Feb 14, 2026</span>
+                <span>Expires: Feb 14, 2028</span>
+              </div>
+              <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--color-border-subtle);">
+                <div class="profile-info-row"><span class="profile-info-label">Coverage</span><span class="profile-info-value">Parts + Labor</span></div>
+                <div class="profile-info-row"><span class="profile-info-label">Response Time</span><span class="profile-info-value">24 hours</span></div>
+                <div class="profile-info-row"><span class="profile-info-label">Filter Changes</span><span class="profile-info-value">2 included</span></div>
+                <div class="profile-info-row"><span class="profile-info-label">Transferable</span><span class="profile-info-value" style="color: var(--color-success);">Yes</span></div>
+              </div>
+            </div>
+
+            <div class="warranty-card" style="margin-top: var(--space-4);">
+              <div class="warranty-header">
+                <div class="warranty-icon" style="background: var(--color-cyan-glow); color: var(--color-cyan);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                </div>
+                <div>
+                  <div class="warranty-title">Manufacturer Warranty</div>
+                  <div class="warranty-subtitle">Waterdrop Standard — 1 Year</div>
+                </div>
+              </div>
+              <div class="warranty-progress">
+                <div class="warranty-progress-bar" style="width: 8%; background: linear-gradient(90deg, var(--color-cyan), var(--color-violet));"></div>
+              </div>
+              <div class="warranty-dates">
+                <span>Start: Feb 14, 2026</span>
+                <span>Expires: Feb 14, 2027</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service Tab -->
+          <div class="portal-tab-content" id="portal-service">
+            <div class="chart-card" style="margin-bottom: var(--space-4);">
+              <div class="chart-card-header">
+                <div class="chart-card-title">Next Filter Change</div>
+                <span class="badge badge-scheduled">Scheduled</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-5); padding: var(--space-4) 0;">
+                <div style="text-align: center;">
+                  <div style="font-size: var(--text-xl); font-weight: 700; color: var(--color-cyan); font-variant-numeric: tabular-nums;">158</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted);">Days Until Due</div>
+                </div>
+                <div style="flex: 1;">
+                  <div class="warranty-progress" style="height: 8px;">
+                    <div class="warranty-progress-bar" style="width: 15%; background: linear-gradient(90deg, var(--color-cyan), var(--color-violet));"></div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; margin-top: var(--space-2);">
+                    <span style="font-size: var(--text-xs); color: var(--color-text-faint);">Installed Feb 14</span>
+                    <span style="font-size: var(--text-xs); color: var(--color-text-faint);">Due Aug 14</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="table-card">
+              <div class="table-card-header">
+                <div class="table-card-title">Service History</div>
+              </div>
+              <div style="overflow-x: auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Date</th><th>Service</th><th>Technician</th><th>Status</th><th>Notes</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Feb 14, 2026</td><td>Initial Installation</td><td>Marco R.</td><td><span class="badge badge-completed">Completed</span></td><td>Clean install, TDS reduced to 12 ppm</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ========================================
-         PAGE 5: MESSAGES
-         ======================================== -->
-    <div class="page" id="page-messages">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchMsgTab('email')">Email Log</button>
-        <button class="tab-btn" onclick="switchMsgTab('sms')">SMS Sequences</button>
-      </div>
-
-      <!-- Email Tab -->
-      <div class="tab-content active" id="tab-email">
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Direction</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Subject</th>
-                  <th>Template</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="email-log-body">
-                <tr><td colspan="7"><div class="skeleton skeleton-text lg"></div></td></tr>
-              </tbody>
-            </table>
+    <!-- ============================== -->
+    <!-- VIEW: TECHNICIAN DISPATCH      -->
+    <!-- ============================== -->
+    <section class="view" id="view-dispatch">
+      <div class="dispatch-header">
+        <div class="dispatch-stat-card">
+          <div class="dispatch-stat-icon cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <div>
+            <div class="dispatch-stat-value">5</div>
+            <div class="dispatch-stat-label">Today's Jobs</div>
+          </div>
+        </div>
+        <div class="dispatch-stat-card">
+          <div class="dispatch-stat-icon pink">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <div class="dispatch-stat-value">3</div>
+            <div class="dispatch-stat-label">In Progress</div>
+          </div>
+        </div>
+        <div class="dispatch-stat-card">
+          <div class="dispatch-stat-icon violet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="dispatch-stat-value">3</div>
+            <div class="dispatch-stat-label">Techs Online</div>
+          </div>
+        </div>
+        <div class="dispatch-stat-card">
+          <div class="dispatch-stat-icon success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <div>
+            <div class="dispatch-stat-value">2</div>
+            <div class="dispatch-stat-label">Completed</div>
           </div>
         </div>
       </div>
 
-      <!-- SMS Tab -->
-      <div class="tab-content" id="tab-sms">
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Lead</th>
-                  <th>Sequence Type</th>
-                  <th>Current Step</th>
-                  <th>Next Send</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="sms-seq-body">
-                <tr><td colspan="6"><div class="skeleton skeleton-text lg"></div></td></tr>
-              </tbody>
-            </table>
+      <div class="dispatch-map-card">
+        <div class="dispatch-map-header">
+          <div class="dispatch-map-title">Live Job Map — Miami</div>
+          <div style="display: flex; gap: var(--space-3); align-items: center;">
+            <span class="map-legend-item"><span class="map-legend-dot" style="background: var(--color-cyan);"></span>Jobs</span>
+            <span class="map-legend-item"><span class="map-legend-dot" style="background: var(--color-warning); border-radius: 50%;"></span>Techs</span>
+          </div>
+        </div>
+        <div id="dispatchMap" style="height: 350px; border-radius: 0 0 var(--radius-lg) var(--radius-lg);"></div>
+      </div>
+
+      <div class="dispatch-grid">
+        <div class="dispatch-calendar">
+          <div class="dispatch-calendar-header">
+            <div class="dispatch-calendar-title">Today — Tuesday, Mar 10</div>
+            <div style="display: flex; gap: var(--space-2);">
+              <button class="btn btn-secondary" style="font-size: var(--text-xs);">← Prev</button>
+              <button class="btn btn-secondary" style="font-size: var(--text-xs);">Next →</button>
+            </div>
+          </div>
+          <div class="time-grid">
+            <div class="time-row">
+              <div class="time-label">8:00 AM</div>
+              <div class="time-slot">
+                <div class="job-block cyan">
+                  <div class="job-block-title">Kitchen Guard — C. Diaz</div>
+                  <div class="job-block-detail">1220 NW 12th Ave, 33126 — Marco R.</div>
+                </div>
+              </div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">9:00 AM</div>
+              <div class="time-slot">
+                <div class="job-block violet">
+                  <div class="job-block-title">Water Test — P. Johnson</div>
+                  <div class="job-block-detail">445 Collins Ave, 33140 — Ana T.</div>
+                </div>
+              </div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">10:00 AM</div>
+              <div class="time-slot">
+                <div class="job-block pink">
+                  <div class="job-block-title">Home Shield — J. Rodriguez</div>
+                  <div class="job-block-detail">900 Biscayne Blvd, 33131 — Marco R.</div>
+                </div>
+              </div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">11:00 AM</div>
+              <div class="time-slot"></div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">12:00 PM</div>
+              <div class="time-slot"></div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">1:00 PM</div>
+              <div class="time-slot">
+                <div class="job-block success">
+                  <div class="job-block-title">Filter Change — M. Santos</div>
+                  <div class="job-block-detail">1842 Brickell Ave, 33139 — Ana T.</div>
+                </div>
+              </div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">2:00 PM</div>
+              <div class="time-slot">
+                <div class="job-block cyan">
+                  <div class="job-block-title">Pure Life — N. Thompson</div>
+                  <div class="job-block-detail">3200 Coral Way, 33145 — Luis G.</div>
+                </div>
+              </div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">3:00 PM</div>
+              <div class="time-slot"></div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">4:00 PM</div>
+              <div class="time-slot"></div>
+            </div>
+            <div class="time-row">
+              <div class="time-label">5:00 PM</div>
+              <div class="time-slot"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-list">
+          <!-- Tech 1 -->
+          <div class="tech-card">
+            <div class="tech-card-header">
+              <div class="tech-avatar cyan">MR</div>
+              <div>
+                <div class="tech-name">Marco Rodriguez</div>
+                <div class="tech-role">Lead Installer</div>
+              </div>
+              <div class="tech-status">
+                <div class="tech-status-dot busy"></div>
+                <span style="color: var(--color-warning);">On Job</span>
+              </div>
+            </div>
+            <div class="tech-stats">
+              <div><div class="tech-stat-value">47</div><div class="tech-stat-label">Installs</div></div>
+              <div><div class="tech-stat-value">4.9</div><div class="tech-stat-label">Rating</div></div>
+              <div><div class="tech-stat-value">2</div><div class="tech-stat-label">Today</div></div>
+            </div>
+            <div class="tech-jobs-list">
+              <div class="tech-job-item">
+                <span class="tech-job-time">8:00 AM</span>
+                <span>Kitchen Guard — C. Diaz</span>
+                <span class="badge badge-in-progress" style="margin-left: auto;">In Progress</span>
+              </div>
+              <div class="tech-job-item">
+                <span class="tech-job-time">10:00 AM</span>
+                <span>Home Shield — J. Rodriguez</span>
+                <span class="badge badge-scheduled" style="margin-left: auto;">Upcoming</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech 2 -->
+          <div class="tech-card">
+            <div class="tech-card-header">
+              <div class="tech-avatar pink">AT</div>
+              <div>
+                <div class="tech-name">Ana Torres</div>
+                <div class="tech-role">Water Quality Specialist</div>
+              </div>
+              <div class="tech-status">
+                <div class="tech-status-dot online"></div>
+                <span style="color: var(--color-success);">Available</span>
+              </div>
+            </div>
+            <div class="tech-stats">
+              <div><div class="tech-stat-value">32</div><div class="tech-stat-label">Installs</div></div>
+              <div><div class="tech-stat-value">5.0</div><div class="tech-stat-label">Rating</div></div>
+              <div><div class="tech-stat-value">2</div><div class="tech-stat-label">Today</div></div>
+            </div>
+            <div class="tech-jobs-list">
+              <div class="tech-job-item">
+                <span class="tech-job-time">9:00 AM</span>
+                <span>Water Test — P. Johnson</span>
+                <span class="badge badge-scheduled" style="margin-left: auto;">Upcoming</span>
+              </div>
+              <div class="tech-job-item">
+                <span class="tech-job-time">1:00 PM</span>
+                <span>Filter Change — M. Santos</span>
+                <span class="badge badge-scheduled" style="margin-left: auto;">Upcoming</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech 3 -->
+          <div class="tech-card">
+            <div class="tech-card-header">
+              <div class="tech-avatar violet">LG</div>
+              <div>
+                <div class="tech-name">Luis Garcia</div>
+                <div class="tech-role">Licensed Plumber</div>
+              </div>
+              <div class="tech-status">
+                <div class="tech-status-dot online"></div>
+                <span style="color: var(--color-success);">Available</span>
+              </div>
+            </div>
+            <div class="tech-stats">
+              <div><div class="tech-stat-value">28</div><div class="tech-stat-label">Installs</div></div>
+              <div><div class="tech-stat-value">4.8</div><div class="tech-stat-label">Rating</div></div>
+              <div><div class="tech-stat-value">1</div><div class="tech-stat-label">Today</div></div>
+            </div>
+            <div class="tech-jobs-list">
+              <div class="tech-job-item">
+                <span class="tech-job-time">2:00 PM</span>
+                <span>Pure Life — N. Thompson</span>
+                <span class="badge badge-scheduled" style="margin-left: auto;">Upcoming</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ========================================
-         PAGE 6: BOTS
-         ======================================== -->
-    <div class="page" id="page-bots">
-      <div class="toolbar" style="margin-bottom:20px">
-        <button class="btn btn-secondary" onclick="loadBotsPage()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          Refresh Status
-        </button>
+    <!-- ============================== -->
+    <!-- VIEW: AUTOMATIONS              -->
+    <!-- ============================== -->
+    <section class="view" id="view-automations">
+      <p class="automations-subtitle">Trigger-action workflows for SMS, email, and push notifications</p>
+      <div class="automations-grid" id="automationsGrid">
       </div>
-      <div class="bot-grid" id="bot-grid">
-        <div class="skeleton skeleton-block" style="height:240px"></div>
-        <div class="skeleton skeleton-block" style="height:240px"></div>
-        <div class="skeleton skeleton-block" style="height:240px"></div>
-      </div>
-    </div>
-
-    <!-- ========================================
-         PAGE 7: SETTINGS
-         ======================================== -->
-    <div class="page" id="page-settings">
-      <div class="settings-grid" id="settings-grid">
-        <div class="skeleton skeleton-block" style="height:200px"></div>
-        <div class="skeleton skeleton-block" style="height:200px"></div>
-      </div>
-    </div>
-
+    </section>
   </main>
 </div>
 
-<!-- ========================================
-     TASK MODAL
-     ======================================== -->
-<div class="modal-overlay" id="task-modal">
-  <div class="modal">
+<!-- ===== STRIPE CHECKOUT MODAL ===== -->
+<div class="modal-overlay" id="stripeModal">
+  <div class="modal-card">
+    <button class="modal-close" id="stripeModalClose">&times;</button>
     <div class="modal-header">
-      <span class="modal-title">New Task</span>
-      <button class="btn-icon" onclick="closeModal('task-modal')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="8" fill="url(#modal-logo-grad)"/>
+        <path d="M10 18C10 13.58 13.58 10 18 10C18 14.42 21.58 18 26 18C26 22.42 22.42 26 18 26C18 21.58 14.42 18 10 18Z" fill="white" opacity="0.9"/>
+        <circle cx="18" cy="18" r="3" fill="white"/>
+        <defs>
+          <linearGradient id="modal-logo-grad" x1="0" y1="0" x2="36" y2="36">
+            <stop stop-color="#E8439A"/>
+            <stop offset="0.5" stop-color="#5B6BF5"/>
+            <stop offset="1" stop-color="#00C9DB"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div>
+        <div class="modal-brand">CrystalFlow</div>
+        <div class="modal-brand-sub">Secure Checkout</div>
+      </div>
     </div>
     <div class="modal-body">
-      <form id="modal-task-form" onsubmit="handleModalTaskSubmit(event)">
-        <div class="form-group" style="margin-bottom:12px">
-          <label>Title *</label>
-          <input type="text" id="modal-task-title" required placeholder="Task title">
+      <div class="modal-summary">
+        <div class="modal-summary-title">Order Summary</div>
+        <div class="modal-summary-line"><span id="modalPkgName">Kitchen Guard</span><span id="modalPkgPrice">$699</span></div>
+        <div class="modal-summary-line modal-addons-line" id="modalAddonWarranty" style="display:none;"><span>Extended Warranty</span><span>$149</span></div>
+        <div class="modal-summary-line modal-addons-line" id="modalAddonFilter" style="display:none;"><span>Filter Subscription</span><span>$99</span></div>
+        <div class="modal-summary-line modal-addons-line" id="modalAddonRush" style="display:none;"><span>Rush Install</span><span>$199</span></div>
+        <div class="modal-summary-divider"></div>
+        <div class="modal-summary-line modal-summary-total"><span>Total</span><span id="modalTotal">$699</span></div>
+        <div class="modal-deposit-badge">50% Deposit Required — <strong id="modalDeposit">$350</strong></div>
+      </div>
+      <div class="modal-form" id="stripeForm">
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <label class="form-label">Card Number</label>
+          <input class="form-input" type="text" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNumber">
         </div>
-        <div class="form-group" style="margin-bottom:12px">
-          <label>Description</label>
-          <textarea id="modal-task-desc" placeholder="Description (optional)"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Priority</label>
-            <select id="modal-task-priority">
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-3);">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label">Expiry</label>
+            <input class="form-input" type="text" placeholder="MM/YY" maxlength="5" id="cardExpiry">
           </div>
-          <div class="form-group">
-            <label>Due Date</label>
-            <input type="date" id="modal-task-due">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label">CVC</label>
+            <input class="form-input" type="text" placeholder="123" maxlength="4" id="cardCVC">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label">Zip</label>
+            <input class="form-input" type="text" placeholder="33139" maxlength="5" id="cardZip">
           </div>
         </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="document.getElementById('modal-task-form').requestSubmit()">Create Task</button>
+        <button class="btn btn-primary modal-pay-btn" id="modalPayBtn" style="width: 100%; justify-content: center; padding: var(--space-3) var(--space-4); font-size: var(--text-sm); font-weight: 600;">Pay $350.00</button>
+      </div>
+      <div class="modal-success" id="modalSuccess" style="display: none;">
+        <div class="modal-success-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+        </div>
+        <div class="modal-success-title">Payment Confirmed</div>
+        <div class="modal-success-desc">Your deposit has been processed. A receipt has been sent to your email.</div>
+        <button class="btn btn-secondary" id="modalSuccessClose" style="margin-top: var(--space-4);">Close</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========================================
-     LEAD MODAL
-     ======================================== -->
-<div class="modal-overlay" id="lead-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">Add Lead</span>
-      <button class="btn-icon" onclick="closeModal('lead-modal')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form id="lead-form" onsubmit="handleLeadSubmit(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Name *</label>
-            <input type="text" id="lead-name" required placeholder="Full name">
-          </div>
-          <div class="form-group">
-            <label>Email *</label>
-            <input type="email" id="lead-email" required placeholder="Email address">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Phone *</label>
-            <input type="tel" id="lead-phone" required placeholder="Phone number">
-          </div>
-          <div class="form-group">
-            <label>Source</label>
-            <select id="lead-source">
-              <option value="website">Website</option>
-              <option value="referral">Referral</option>
-              <option value="social">Social Media</option>
-              <option value="manual">Manual Entry</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Address</label>
-            <input type="text" id="lead-address" placeholder="Street address">
-          </div>
-          <div class="form-group">
-            <label>Package Interest</label>
-            <select id="lead-package">
-              <option value="unknown">Unknown</option>
-              <option value="kitchen_guard">Kitchen Guard</option>
-              <option value="home_shield">Home Shield</option>
-              <option value="pure_life">Pure Life</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:4px">
-          <label>Notes</label>
-          <textarea id="lead-notes" placeholder="Additional notes (optional)"></textarea>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('lead-modal')">Cancel</button>
-      <button class="btn btn-primary" id="lead-submit-btn" onclick="document.getElementById('lead-form').requestSubmit()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Lead
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ========================================
-     EDIT TASK MODAL
-     ======================================== -->
-<div class="modal-overlay" id="edit-task-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">Edit Task</span>
-      <button class="btn-icon" onclick="closeModal('edit-task-modal')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form id="edit-task-form" onsubmit="handleEditTaskSubmit(event)">
-        <input type="hidden" id="edit-task-id">
-        <div class="form-group" style="margin-bottom:12px">
-          <label>Title *</label>
-          <input type="text" id="edit-task-title" required>
-        </div>
-        <div class="form-group" style="margin-bottom:12px">
-          <label>Description</label>
-          <textarea id="edit-task-desc"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Priority</label>
-            <select id="edit-task-priority">
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Status</label>
-            <select id="edit-task-status">
-              <option value="todo">To Do</option>
-              <option value="in_progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Category</label>
-            <select id="edit-task-category">
-              <option value="general">General</option>
-              <option value="follow_up">Follow Up</option>
-              <option value="installation">Installation</option>
-              <option value="consultation">Consultation</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Due Date</label>
-            <input type="date" id="edit-task-due">
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-danger" onclick="deleteEditingTask()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-        Delete
-      </button>
-      <button class="btn btn-secondary" onclick="closeModal('edit-task-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="document.getElementById('edit-task-form').requestSubmit()">Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ========================================
-   CONSTANTS & STATE
-   ======================================== */
-const API = 'https://crystalflow-api.onrender.com';
-let state = {
-  leads: [],
-  tasks: [],
-  appointments: [],
-  emailLogs: [],
-  smsSequences: [],
-  dashboard: null,
-  health: null,
-  currentPage: 'command-center',
-  calendarWeekStart: getWeekStart(new Date()),
-  apptView: 'calendar',
-  autoRefreshTimer: null,
-  botsApiData: []
-};
-
-/* ========================================
-   UTILITY FUNCTIONS
-   ======================================== */
-function getWeekStart(date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  d.setDate(d.getDate() - day);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function timeAgo(dateStr) {
-  if (!dateStr) return '';
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diff = Math.floor((now - date) / 1000);
-  if (diff < 0) return 'Just now';
-  if (diff < 60) return diff + 's ago';
-  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-  if (diff < 172800) return 'Yesterday';
-  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '--';
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function formatTime(dateStr) {
-  if (!dateStr) return '--';
-  return new Date(dateStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-}
-
-function formatDateTime(dateStr) {
-  if (!dateStr) return '--';
-  return formatDate(dateStr) + ' ' + formatTime(dateStr);
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ');
-}
-
-function badgeClass(value) {
-  return 'badge badge-' + (value || 'unknown').toLowerCase().replace(/\s/g, '-');
-}
-
-/* ========================================
-   API FUNCTIONS
-   ======================================== */
-async function apiFetch(path, options = {}) {
-  try {
-    const res = await fetch(API + path, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-      }
-    });
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error('API error: ' + res.status);
-    }
-    return await res.json();
-  } catch (err) {
-    console.error('API error:', path, err);
-    return null;
-  }
-}
-
-async function loadDashboard() {
-  const data = await apiFetch('/api/dashboard');
-  if (data) state.dashboard = data;
-  return data;
-}
-
-async function loadLeads() {
-  const data = await apiFetch('/api/leads');
-  if (data) state.leads = Array.isArray(data) ? data : [];
-  return state.leads;
-}
-
-async function loadLead(id) {
-  return await apiFetch('/api/leads/' + id);
-}
-
-async function loadAppointments() {
-  const data = await apiFetch('/api/appointments');
-  if (data) state.appointments = Array.isArray(data) ? data : [];
-  return state.appointments;
-}
-
-async function loadEmailLog() {
-  const data = await apiFetch('/api/email/log');
-  if (data) state.emailLogs = Array.isArray(data) ? data : [];
-  return state.emailLogs;
-}
-
-async function loadSmsSequences() {
-  const data = await apiFetch('/api/sms/sequences');
-  if (data) state.smsSequences = Array.isArray(data) ? data : [];
-  return state.smsSequences;
-}
-
-async function loadHealth() {
-  const data = await apiFetch('/api/health');
-  if (data) state.health = data;
-  return data;
-}
-
-async function createLead(leadData) {
-  return await apiFetch('/api/leads', {
-    method: 'POST',
-    body: JSON.stringify(leadData)
-  });
-}
-
-/* ========================================
-   LOCAL TASK MANAGEMENT (client-side storage)
-   ======================================== */
-// In-memory task storage (persists during session)
-let _taskStore = [];
-
-function getLocalTasks() {
-  return _taskStore;
-}
-
-function saveLocalTasks(tasks) {
-  _taskStore = tasks;
-  state.tasks = tasks;
-}
-
-function addLocalTask(task) {
-  const tasks = getLocalTasks();
-  task.id = Date.now().toString();
-  task.created_at = new Date().toISOString();
-  tasks.push(task);
-  saveLocalTasks(tasks);
-  return task;
-}
-
-function updateLocalTask(id, updates) {
-  const tasks = getLocalTasks();
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx !== -1) {
-    tasks[idx] = { ...tasks[idx], ...updates };
-    saveLocalTasks(tasks);
-    return tasks[idx];
-  }
-  return null;
-}
-
-function deleteLocalTask(id) {
-  const tasks = getLocalTasks().filter(t => t.id !== id);
-  saveLocalTasks(tasks);
-}
-
-/* ========================================
-   NAVIGATION
-   ======================================== */
-const pageTitles = {
-  'command-center': 'Command Center',
-  'tasks': 'Tasks',
-  'leads': 'Leads',
-  'appointments': 'Appointments',
-  'messages': 'Messages',
-  'bots': 'Bots',
-  'settings': 'Settings'
-};
-
-function navigate(page) {
-  // Clear auto-refresh
-  if (state.autoRefreshTimer) {
-    clearInterval(state.autoRefreshTimer);
-    state.autoRefreshTimer = null;
-  }
-
-  state.currentPage = page;
-  window.location.hash = page;
-
-  // Update nav
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.page === page);
-  });
-
-  // Update pages
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const pageEl = document.getElementById('page-' + page);
-  if (pageEl) pageEl.classList.add('active');
-
-  // Update header
-  document.getElementById('header-title').textContent = pageTitles[page] || 'Dashboard';
-
-  // Load page data
-  loadPageData(page);
-}
-
-async function loadPageData(page) {
-  switch (page) {
-    case 'command-center':
-      loadCommandCenter();
-      // Auto-refresh every 30s
-      state.autoRefreshTimer = setInterval(loadCommandCenter, 30000);
-      break;
-    case 'tasks':
-      loadTasksPage();
-      break;
-    case 'leads':
-      loadLeadsPage();
-      break;
-    case 'appointments':
-      loadAppointmentsPage();
-      break;
-    case 'messages':
-      loadMessagesPage();
-      break;
-    case 'bots':
-      loadBotsPage();
-      break;
-    case 'settings':
-      loadSettingsPage();
-      break;
-  }
-}
-
-function refreshCurrentPage() {
-  const btn = document.getElementById('refresh-btn');
-  btn.classList.add('spinning');
-  loadPageData(state.currentPage).then(() => {
-    setTimeout(() => btn.classList.remove('spinning'), 500);
-  }).catch(() => btn.classList.remove('spinning'));
-}
-
-/* ========================================
-   COMMAND CENTER PAGE
-   ======================================== */
-async function loadCommandCenter() {
-  const [dashboard, leads, emailLogs, smsSeqs] = await Promise.all([
-    loadDashboard(),
-    loadLeads(),
-    loadEmailLog(),
-    loadSmsSequences()
-  ]);
-
-  // KPIs
-  const totalLeads = dashboard ? dashboard.leads.total : state.leads.length;
-  const activeTasks = getLocalTasks().filter(t => t.status !== 'done').length;
-  const upcomingAppts = dashboard ? dashboard.appointments.upcoming_7_days : 0;
-  const emailsSent = state.emailLogs.filter(e => e.direction === 'outbound').length;
-  const smsSent = state.smsSequences.length;
-
-  animateValue('kpi-leads', totalLeads);
-  animateValue('kpi-tasks', activeTasks);
-  animateValue('kpi-appointments', upcomingAppts);
-  animateValue('kpi-emails', emailsSent);
-  animateValue('kpi-sms', smsSent);
-
-  // Fetch live bot stats
-  try {
-    const botsResp = await apiFetch('/api/bots/status');
-    state.botsApiData = (botsResp && botsResp.bots) ? botsResp.bots : [];
-  } catch(e) { state.botsApiData = []; }
-
-  // Bot Status
-  renderBotStatusPanel(dashboard);
-
-  // Activity Feed
-  renderActivityFeed(dashboard);
-}
-
-function animateValue(elementId, target) {
-  const el = document.getElementById(elementId);
-  if (!el) return;
-  const current = parseInt(el.textContent) || 0;
-  if (current === target) { el.textContent = target; return; }
-  const duration = 400;
-  const start = performance.now();
-  function tick(now) {
-    const progress = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(current + (target - current) * eased);
-    if (progress < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-
-function renderBotStatusPanel(dashboard) {
-  const container = document.getElementById('bot-status-list');
-  const scheduler = dashboard ? dashboard.scheduler : null;
-  const health = state.health;
-
-  // Try to use live bot data if loaded
-  const apiBots = state.botsApiData || [];
-  
-  function apiStat(botId, statKey, fallback) {
-    const b = apiBots.find(x => x.id === botId);
-    return b && b.stats && b.stats[statKey] != null ? b.stats[statKey] : fallback;
-  }
-  function apiStatus(botId, fallback) {
-    const b = apiBots.find(x => x.id === botId);
-    return b ? b.status : fallback;
-  }
-  function apiActivity(botId) {
-    const b = apiBots.find(x => x.id === botId);
-    return b ? b.last_activity : null;
-  }
-
-  const bots = [
-    {
-      name: 'Email Autoresponder',
-      provider: (health && health.email_provider) || 'SendGrid',
-      status: apiStatus('email_autoresponder', 'active'),
-      stat: apiStat('email_autoresponder', 'sent', state.emailLogs.length),
-      statLabel: 'Emails',
-      lastActivity: apiActivity('email_autoresponder') || (state.emailLogs.length > 0 ? state.emailLogs[0].created_at : null)
-    },
-    {
-      name: 'SMS Follow-Up',
-      provider: (health && health.sms_provider) || 'Twilio',
-      status: apiStatus('sms_followup', state.smsSequences.length > 0 ? 'active' : 'standby'),
-      stat: apiStat('sms_followup', 'active_sequences', state.smsSequences.length),
-      statLabel: 'Sequences',
-      lastActivity: apiActivity('sms_followup') || (state.smsSequences.length > 0 ? state.smsSequences[0].created_at : null)
-    },
-    {
-      name: 'Lead Intake',
-      provider: 'Webhook',
-      status: apiStatus('lead_intake', state.leads.length > 0 ? 'active' : 'standby'),
-      stat: apiStat('lead_intake', 'total_leads', state.leads.length),
-      statLabel: 'Leads',
-      lastActivity: apiActivity('lead_intake') || (state.leads.length > 0 ? state.leads[state.leads.length - 1].created_at : null)
-    },
-    {
-      name: 'Appointment Scheduler',
-      provider: 'Calendly',
-      status: apiStatus('appointment_scheduler', state.appointments.length > 0 ? 'active' : 'standby'),
-      stat: apiStat('appointment_scheduler', 'upcoming', state.appointments.length),
-      statLabel: 'Booked',
-      lastActivity: apiActivity('appointment_scheduler') || (state.appointments.length > 0 ? state.appointments[0].created_at : null)
-    },
-    {
-      name: 'Background Scheduler',
-      provider: 'APScheduler',
-      status: apiStatus('background_scheduler', (scheduler && scheduler.running) ? 'active' : 'stopped'),
-      stat: apiStat('background_scheduler', 'jobs', (scheduler && scheduler.jobs) ? scheduler.jobs.length : 0),
-      statLabel: 'Jobs',
-      lastActivity: apiActivity('background_scheduler') || (dashboard ? dashboard.generated_at : null)
-    },
-    {
-      name: 'Email Automation',
-      provider: 'Internal',
-      status: apiStatus('email_automation', 'active'),
-      stat: apiStat('email_automation', 'active_sequences', '--'),
-      statLabel: 'Seq. Active',
-      lastActivity: apiActivity('email_automation')
-    },
-    {
-      name: 'Content Generator',
-      provider: 'Internal',
-      status: apiStatus('content_generator', 'standby'),
-      stat: apiStat('content_generator', 'total_generated', '--'),
-      statLabel: 'Posts',
-      lastActivity: apiActivity('content_generator')
-    },
-    {
-      name: 'Social Poster',
-      provider: 'Meta API',
-      status: apiStatus('social_poster', 'standby'),
-      stat: apiStat('social_poster', 'total_posted', '--'),
-      statLabel: 'Posted',
-      lastActivity: apiActivity('social_poster')
-    },
-    {
-      name: 'IG Lead Bot',
-      provider: 'ManyChat AI',
-      status: apiStatus('ig_lead_bot', 'active'),
-      stat: apiStat('ig_lead_bot', 'total_conversations', '--'),
-      statLabel: 'DMs',
-      lastActivity: apiActivity('ig_lead_bot')
-    },
-    {
-      name: 'SEO Bot',
-      provider: 'Internal',
-      status: apiStatus('seo_bot', 'active'),
-      stat: apiStat('seo_bot', 'total_reports', '--'),
-      statLabel: 'Reports',
-      lastActivity: apiActivity('seo_bot')
-    }
-  ];
-
-  container.innerHTML = bots.map(bot => `
-    <div class="bot-card">
-      <div class="bot-status-dot ${bot.status}"></div>
-      <div class="bot-info">
-        <div class="bot-name">${escapeHtml(bot.name)}</div>
-        <div class="bot-provider">${escapeHtml(capitalize(bot.provider))}</div>
-      </div>
-      <div class="bot-stat">
-        <div class="bot-stat-value">${bot.stat}</div>
-        <div class="bot-stat-label">${bot.statLabel}</div>
-      </div>
-      <div class="bot-time">${bot.lastActivity ? timeAgo(bot.lastActivity) : '--'}</div>
-    </div>
-  `).join('');
-}
-
-function renderActivityFeed(dashboard) {
-  const container = document.getElementById('activity-feed');
-  const activities = (dashboard && dashboard.recent_activity) ? dashboard.recent_activity : [];
-
-  // Also include email logs and sms as activity
-  const allActivity = [];
-
-  activities.forEach(a => {
-    allActivity.push({
-      type: a.event_type,
-      desc: a.description,
-      lead_id: a.lead_id,
-      time: a.created_at
-    });
-  });
-
-  state.emailLogs.forEach(e => {
-    allActivity.push({
-      type: 'email_sent',
-      desc: 'Email: ' + (e.subject || 'No subject') + ' to ' + (e.to_address || ''),
-      lead_id: e.lead_id,
-      time: e.created_at
-    });
-  });
-
-  // Deduplicate by time and sort
-  const seen = new Set();
-  const unique = allActivity.filter(a => {
-    const key = a.type + '_' + a.time;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
-  unique.sort((a, b) => new Date(b.time) - new Date(a.time));
-  const items = unique.slice(0, 15);
-
-  if (items.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <div class="empty-state-title">No activity yet</div>
-        <div class="empty-state-desc">Activity will appear here as leads come in and actions are taken.</div>
-      </div>`;
-    return;
-  }
-
-  const iconMap = {
-    form_submitted: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-    email_sent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
-    sms_enrolled: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
-    appointment_booked: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-    status_change: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>'
-  };
-
-  container.innerHTML = items.map(item => `
-    <div class="activity-item">
-      <div class="activity-badge ${item.type}">
-        ${iconMap[item.type] || iconMap.status_change}
-      </div>
-      <div class="activity-content">
-        <div class="activity-desc">${escapeHtml(item.desc)}</div>
-        <div class="activity-time">${timeAgo(item.time)}</div>
-      </div>
-    </div>
-  `).join('');
-
-  document.getElementById('activity-updated').textContent = 'Updated ' + timeAgo(new Date().toISOString());
-}
-
-/* ========================================
-   TASKS PAGE
-   ======================================== */
-async function loadTasksPage() {
-  state.tasks = getLocalTasks();
-  await loadLeads(); // for lead dropdown
-  populateLeadDropdown();
-  renderTasks();
-}
-
-function populateLeadDropdown() {
-  const sel = document.getElementById('task-lead');
-  sel.innerHTML = '<option value="">None</option>';
-  state.leads.forEach(l => {
-    sel.innerHTML += `<option value="${l.id}">${escapeHtml(l.name)}</option>`;
-  });
-}
-
-function renderTasks() {
-  const filterPriority = document.getElementById('task-filter-priority').value;
-  const filterCategory = document.getElementById('task-filter-category').value;
-  const showDone = document.getElementById('task-show-done').checked;
-
-  let tasks = getLocalTasks();
-
-  if (filterPriority) tasks = tasks.filter(t => t.priority === filterPriority);
-  if (filterCategory) tasks = tasks.filter(t => t.category === filterCategory);
-
-  const todo = tasks.filter(t => t.status === 'todo');
-  const inProgress = tasks.filter(t => t.status === 'in_progress');
-  const done = tasks.filter(t => t.status === 'done');
-
-  document.getElementById('count-todo').textContent = todo.length;
-  document.getElementById('count-in-progress').textContent = inProgress.length;
-  document.getElementById('count-done').textContent = done.length;
-
-  document.getElementById('col-todo').innerHTML = renderTaskCards(todo);
-  document.getElementById('col-in-progress').innerHTML = renderTaskCards(inProgress);
-
-  if (showDone) {
-    document.getElementById('col-done').innerHTML = renderTaskCards(done);
-  } else {
-    document.getElementById('col-done').innerHTML = done.length > 0
-      ? `<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12px">${done.length} completed task${done.length!==1?'s':''} hidden</div>`
-      : renderTaskCards([]);
-  }
-}
-
-function renderTaskCards(tasks) {
-  if (tasks.length === 0) {
-    return `<div style="text-align:center;padding:24px;color:var(--gray-400);font-size:12px">No tasks</div>`;
-  }
-
-  return tasks.map(t => {
-    const leadName = t.lead_id ? (state.leads.find(l => l.id == t.lead_id) || {}).name : null;
-    return `
-      <div class="task-card" onclick="openEditTask('${t.id}')">
-        <div class="task-card-title">${escapeHtml(t.title)}</div>
-        <div class="task-card-meta">
-          <span class="${badgeClass(t.priority)}">${capitalize(t.priority)}</span>
-          <span class="badge" style="background:var(--gray-100);color:var(--gray-600)">${capitalize(t.category || 'general')}</span>
-          ${t.due_date ? `<span class="task-card-due"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${formatDate(t.due_date)}</span>` : ''}
-        </div>
-        ${leadName ? `<div class="task-card-lead">Linked: ${escapeHtml(leadName)}</div>` : ''}
-        <div class="task-card-actions">
-          ${t.status !== 'done'
-            ? `<button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();advanceTask('${t.id}')" title="Move to next stage">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
-                ${t.status === 'todo' ? 'Start' : 'Complete'}
-              </button>`
-            : ''}
-          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete task" style="margin-left:auto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function handleTaskSubmit(e) {
-  e.preventDefault();
-  const task = {
-    title: document.getElementById('task-title').value.trim(),
-    description: document.getElementById('task-desc').value.trim(),
-    priority: document.getElementById('task-priority').value,
-    category: document.getElementById('task-category').value,
-    due_date: document.getElementById('task-due').value || null,
-    lead_id: document.getElementById('task-lead').value || null,
-    status: 'todo'
-  };
-
-  if (!task.title) return;
-  addLocalTask(task);
-  document.getElementById('task-form').reset();
-  renderTasks();
-}
-
-function handleModalTaskSubmit(e) {
-  e.preventDefault();
-  const task = {
-    title: document.getElementById('modal-task-title').value.trim(),
-    description: document.getElementById('modal-task-desc').value.trim(),
-    priority: document.getElementById('modal-task-priority').value,
-    category: 'general',
-    due_date: document.getElementById('modal-task-due').value || null,
-    lead_id: null,
-    status: 'todo'
-  };
-
-  if (!task.title) return;
-  addLocalTask(task);
-  closeModal('task-modal');
-  document.getElementById('modal-task-form').reset();
-  if (state.currentPage === 'tasks') renderTasks();
-}
-
-function advanceTask(id) {
-  const tasks = getLocalTasks();
-  const task = tasks.find(t => t.id === id);
-  if (!task) return;
-  if (task.status === 'todo') task.status = 'in_progress';
-  else if (task.status === 'in_progress') task.status = 'done';
-  saveLocalTasks(tasks);
-  renderTasks();
-}
-
-function deleteTask(id) {
-  deleteLocalTask(id);
-  renderTasks();
-}
-
-function openEditTask(id) {
-  const task = getLocalTasks().find(t => t.id === id);
-  if (!task) return;
-  document.getElementById('edit-task-id').value = task.id;
-  document.getElementById('edit-task-title').value = task.title || '';
-  document.getElementById('edit-task-desc').value = task.description || '';
-  document.getElementById('edit-task-priority').value = task.priority || 'medium';
-  document.getElementById('edit-task-status').value = task.status || 'todo';
-  document.getElementById('edit-task-category').value = task.category || 'general';
-  document.getElementById('edit-task-due').value = task.due_date || '';
-  openModal('edit-task-modal');
-}
-
-function handleEditTaskSubmit(e) {
-  e.preventDefault();
-  const id = document.getElementById('edit-task-id').value;
-  updateLocalTask(id, {
-    title: document.getElementById('edit-task-title').value.trim(),
-    description: document.getElementById('edit-task-desc').value.trim(),
-    priority: document.getElementById('edit-task-priority').value,
-    status: document.getElementById('edit-task-status').value,
-    category: document.getElementById('edit-task-category').value,
-    due_date: document.getElementById('edit-task-due').value || null
-  });
-  closeModal('edit-task-modal');
-  renderTasks();
-}
-
-function deleteEditingTask() {
-  const id = document.getElementById('edit-task-id').value;
-  deleteLocalTask(id);
-  closeModal('edit-task-modal');
-  renderTasks();
-}
-
-/* ========================================
-   LEADS PAGE
-   ======================================== */
-async function loadLeadsPage() {
-  await loadLeads();
-  renderLeads();
-}
-
-function renderLeads() {
-  const search = (document.getElementById('lead-search').value || '').toLowerCase();
-  const statusFilter = document.getElementById('lead-status-filter').value;
-  const scoreFilter = document.getElementById('lead-score-filter').value;
-
-  let leads = state.leads;
-  if (search) {
-    leads = leads.filter(l =>
-      (l.name || '').toLowerCase().includes(search) ||
-      (l.email || '').toLowerCase().includes(search) ||
-      (l.phone || '').includes(search)
-    );
-  }
-  if (statusFilter) leads = leads.filter(l => l.status === statusFilter);
-  if (scoreFilter) leads = leads.filter(l => l.score === scoreFilter);
-
-  const tbody = document.getElementById('leads-table-body');
-
-  if (leads.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="8">
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>
-          <div class="empty-state-title">No leads found</div>
-          <div class="empty-state-desc">Adjust your filters or add a new lead to get started.</div>
-        </div>
-      </td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = leads.map(l => `
-    <tr onclick="openLeadDetail(${l.id})" style="cursor:pointer">
-      <td><strong>${escapeHtml(l.name)}</strong></td>
-      <td>${escapeHtml(l.email)}</td>
-      <td>${escapeHtml(l.phone)}</td>
-      <td><span class="${badgeClass(l.status)}">${capitalize(l.status)}</span></td>
-      <td><span class="${badgeClass(l.score)}">${capitalize(l.score)}</span></td>
-      <td>${capitalize(l.package_interest)}</td>
-      <td>${capitalize(l.source)}</td>
-      <td>${timeAgo(l.created_at)}</td>
-    </tr>
-  `).join('');
-}
-
-async function openLeadDetail(id) {
-  const lead = await loadLead(id);
-  if (!lead) return;
-
-  document.getElementById('lead-detail-name').textContent = lead.name || 'Lead Detail';
-  const body = document.getElementById('lead-detail-body');
-
-  const fields = [
-    ['Email', lead.email],
-    ['Phone', lead.phone],
-    ['Address', lead.address],
-    ['Status', lead.status],
-    ['Score', lead.score + (lead.score_value ? ' (' + lead.score_value.toFixed(1) + ')' : '')],
-    ['Package', capitalize(lead.package_interest)],
-    ['Source', capitalize(lead.source)],
-    ['Urgency', capitalize(lead.urgency)],
-    ['Notes', lead.notes],
-    ['Created', formatDateTime(lead.created_at)]
-  ];
-
-  let html = '<div class="detail-section"><div class="detail-section-title">Information</div>';
-  fields.forEach(([label, value]) => {
-    if (value) {
-      html += `<div class="detail-field">
-        <span class="detail-field-label">${label}</span>
-        <span class="detail-field-value">${escapeHtml(String(value))}</span>
-      </div>`;
-    }
-  });
-  html += '</div>';
-
-  // Lifecycle Events
-  if (lead.lifecycle_events && lead.lifecycle_events.length > 0) {
-    html += '<div class="detail-section"><div class="detail-section-title">Lifecycle Events</div><div class="timeline">';
-    lead.lifecycle_events.forEach(ev => {
-      html += `
-        <div class="timeline-item">
-          <div class="timeline-item-desc">${escapeHtml(ev.description)}</div>
-          <div class="timeline-item-time">${timeAgo(ev.created_at)}</div>
-        </div>`;
-    });
-    html += '</div></div>';
-  }
-
-  // Email History
-  if (lead.email_logs && lead.email_logs.length > 0) {
-    html += '<div class="detail-section"><div class="detail-section-title">Email History</div>';
-    lead.email_logs.forEach(e => {
-      html += `
-        <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:8px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <strong style="font-size:13px">${escapeHtml(e.subject)}</strong>
-            <span class="${badgeClass(e.status)}">${capitalize(e.status)}</span>
-          </div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${formatDateTime(e.created_at)} &middot; ${capitalize(e.direction)}</div>
-        </div>`;
-    });
-    html += '</div>';
-  }
-
-  // SMS History
-  if (lead.sms_logs && lead.sms_logs.length > 0) {
-    html += '<div class="detail-section"><div class="detail-section-title">SMS History</div>';
-    lead.sms_logs.forEach(s => {
-      html += `
-        <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:8px">
-          <div style="font-size:13px;color:var(--gray-700)">${escapeHtml(s.message_text)}</div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${formatDateTime(s.created_at)} &middot; <span class="${badgeClass(s.status)}">${capitalize(s.status)}</span></div>
-        </div>`;
-    });
-    html += '</div>';
-  }
-
-  body.innerHTML = html;
-
-  document.getElementById('lead-detail-overlay').classList.add('open');
-  document.getElementById('lead-detail-panel').classList.add('open');
-}
-
-function closeLeadDetail() {
-  document.getElementById('lead-detail-overlay').classList.remove('open');
-  document.getElementById('lead-detail-panel').classList.remove('open');
-}
-
-async function handleLeadSubmit(e) {
-  e.preventDefault();
-  const btn = document.getElementById('lead-submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Adding...';
-
-  const leadData = {
-    name: document.getElementById('lead-name').value.trim(),
-    email: document.getElementById('lead-email').value.trim(),
-    phone: document.getElementById('lead-phone').value.trim(),
-    source: document.getElementById('lead-source').value,
-    address: document.getElementById('lead-address').value.trim() || null,
-    package_interest: document.getElementById('lead-package').value,
-    notes: document.getElementById('lead-notes').value.trim() || null
-  };
-
-  const result = await createLead(leadData);
-  btn.disabled = false;
-  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Lead';
-
-  if (result) {
-    closeModal('lead-modal');
-    document.getElementById('lead-form').reset();
-    await loadLeads();
-    if (state.currentPage === 'leads') renderLeads();
-  }
-}
-
-/* ========================================
-   APPOINTMENTS PAGE
-   ======================================== */
-async function loadAppointmentsPage() {
-  await loadAppointments();
-  renderCalendar();
-  renderAppointmentList();
-}
-
-function changeWeek(delta) {
-  const d = new Date(state.calendarWeekStart);
-  d.setDate(d.getDate() + (delta * 7));
-  state.calendarWeekStart = d;
-  renderCalendar();
-}
-
-function switchApptView(view) {
-  state.apptView = view;
-  document.getElementById('cal-view-btn').classList.toggle('active', view === 'calendar');
-  document.getElementById('list-view-btn').classList.toggle('active', view === 'list');
-  document.getElementById('calendar-view').style.display = view === 'calendar' ? '' : 'none';
-  document.getElementById('list-view').style.display = view === 'list' ? '' : 'none';
-}
-
-function renderCalendar() {
-  const start = new Date(state.calendarWeekStart);
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(d.getDate() + i);
-    days.push(d);
-  }
-
-  const monthStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  document.getElementById('calendar-title').textContent = 'Week of ' + monthStr;
-
-  const hours = [];
-  for (let h = 7; h <= 20; h++) {
-    hours.push(h);
-  }
-
-  const grid = document.getElementById('week-grid');
-  let html = '<div class="week-grid-header"></div>';
-
-  days.forEach(d => {
-    const dayStr = d.toLocaleDateString('en-US', { weekday: 'short' });
-    const dateStr = d.getDate();
-    const isToday = d.toDateString() === new Date().toDateString();
-    html += `<div class="week-grid-header" style="${isToday ? 'background:var(--primary-light);color:var(--primary);font-weight:700' : ''}">${dayStr} ${dateStr}</div>`;
-  });
-
-  hours.forEach(h => {
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const hour12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
-    html += `<div class="week-time">${hour12}${ampm}</div>`;
-
-    days.forEach(d => {
-      const dayAppts = state.appointments.filter(a => {
-        const ad = new Date(a.appointment_date || a.date);
-        return ad.toDateString() === d.toDateString() && ad.getHours() === h;
-      });
-
-      html += `<div class="week-cell">`;
-      dayAppts.forEach(a => {
-        const serviceType = (a.service_type || 'default').toLowerCase().replace(/\s/g, '_');
-        const cls = ['kitchen_guard', 'home_shield', 'pure_life', 'consultation'].includes(serviceType) ? serviceType : 'default';
-        html += `<div class="cal-event ${cls}" title="${escapeHtml(a.lead_name || '')} - ${capitalize(a.service_type || '')}">${escapeHtml(a.lead_name || 'Appointment')}</div>`;
-      });
-      html += `</div>`;
-    });
-  });
-
-  grid.innerHTML = html;
-}
-
-function renderAppointmentList() {
-  const tbody = document.getElementById('appt-list-body');
-
-  if (state.appointments.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="5">
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <div class="empty-state-title">No appointments scheduled</div>
-          <div class="empty-state-desc">Appointments will appear here once leads book consultations.</div>
-        </div>
-      </td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = state.appointments.map(a => {
-    const dateStr = a.appointment_date || a.date;
-    return `
-      <tr>
-        <td>${formatDate(dateStr)}</td>
-        <td>${formatTime(dateStr)}</td>
-        <td>${escapeHtml(a.lead_name || 'Unknown')}</td>
-        <td>${capitalize(a.service_type || '')}</td>
-        <td><span class="${badgeClass(a.status)}">${capitalize(a.status || 'booked')}</span></td>
-      </tr>
-    `;
-  }).join('');
-}
-
-/* ========================================
-   MESSAGES PAGE
-   ======================================== */
-async function loadMessagesPage() {
-  await Promise.all([loadEmailLog(), loadSmsSequences(), loadLeads()]);
-  renderEmailLog();
-  renderSmsSequences();
-}
-
-function switchMsgTab(tab) {
-  document.querySelectorAll('#page-messages .tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('#page-messages .tab-content').forEach(c => c.classList.remove('active'));
-
-  if (tab === 'email') {
-    document.querySelector('#page-messages .tab-btn:first-child').classList.add('active');
-    document.getElementById('tab-email').classList.add('active');
-  } else {
-    document.querySelector('#page-messages .tab-btn:last-child').classList.add('active');
-    document.getElementById('tab-sms').classList.add('active');
-  }
-}
-
-function renderEmailLog() {
-  const tbody = document.getElementById('email-log-body');
-
-  if (state.emailLogs.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="7">
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <div class="empty-state-title">No emails logged</div>
-          <div class="empty-state-desc">Email history will appear here as the autoresponder sends messages.</div>
-        </div>
-      </td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = state.emailLogs.map(e => `
-    <tr>
-      <td>${formatDateTime(e.created_at)}</td>
-      <td><span class="badge" style="background:var(--gray-100);color:var(--gray-600)">${capitalize(e.direction)}</span></td>
-      <td>${escapeHtml(e.from_address)}</td>
-      <td>${escapeHtml(e.to_address)}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(e.subject)}">${escapeHtml(e.subject)}</td>
-      <td>${capitalize(e.template_type)}</td>
-      <td><span class="${badgeClass(e.status)}">${capitalize(e.status)}</span></td>
-    </tr>
-  `).join('');
-}
-
-function renderSmsSequences() {
-  const tbody = document.getElementById('sms-seq-body');
-
-  if (state.smsSequences.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="6">
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          <div class="empty-state-title">No active SMS sequences</div>
-          <div class="empty-state-desc">SMS sequences will start automatically when new leads come in.</div>
-        </div>
-      </td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = state.smsSequences.map(s => {
-    const lead = state.leads.find(l => l.id === s.lead_id);
-    const statusText = s.opted_out ? 'Opted Out' : (s.completed ? 'Completed' : (s.active ? 'Active' : 'Inactive'));
-    const statusClass = s.opted_out ? 'cancelled' : (s.completed ? 'completed' : (s.active ? 'active' : 'inactive'));
-    return `
-      <tr>
-        <td><strong>${escapeHtml(lead ? lead.name : 'Lead #' + s.lead_id)}</strong></td>
-        <td>${capitalize(s.sequence_type)}</td>
-        <td>Step ${s.current_step}</td>
-        <td>${s.next_send_at ? formatDateTime(s.next_send_at) : '--'}</td>
-        <td><span class="${badgeClass(statusClass)}">${statusText}</span></td>
-        <td>
-          ${(s.active && !s.opted_out && !s.completed) ? `<button class="btn btn-sm btn-danger" onclick="optOutSms(${s.id})">Opt Out</button>` : ''}
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-async function optOutSms(seqId) {
-  await apiFetch('/api/sms/opt-out/' + seqId, { method: 'POST' });
-  await loadSmsSequences();
-  renderSmsSequences();
-}
-
-/* ========================================
-   BOTS PAGE
-   ======================================== */
-async function loadBotsPage() {
-  const [dashboard, health] = await Promise.all([loadDashboard(), loadHealth()]);
-  await Promise.all([loadLeads(), loadEmailLog(), loadSmsSequences()]);
-
-  // Fetch bot status from API for live stats
-  let botsApiData = [];
-  try {
-    const botsResp = await apiFetch('/api/bots/status');
-    botsApiData = (botsResp && botsResp.bots) ? botsResp.bots : [];
-  } catch(e) { /* non-fatal */ }
-
-  const scheduler = dashboard ? dashboard.scheduler : null;
-
-  const bots = [
-    {
-      name: 'Email Autoresponder',
-      provider: capitalize((health && health.email_provider) || 'sendgrid'),
-      status: state.emailLogs.length > 0 ? 'active' : 'standby',
-      desc: 'Automatically sends welcome and follow-up emails to new leads using configurable templates. Triggers on form submission and status changes.',
-      stats: [
-        { value: state.emailLogs.filter(e => e.direction === 'outbound').length, label: 'Emails Sent' },
-        { value: state.emailLogs.filter(e => e.status === 'sent' || e.status === 'delivered').length, label: 'Delivered' },
-        { value: state.emailLogs.filter(e => e.status === 'failed').length, label: 'Failed' }
-      ],
-      lastActivity: state.emailLogs.length > 0 ? state.emailLogs[0].created_at : null
-    },
-    {
-      name: 'SMS Follow-Up',
-      provider: capitalize((health && health.sms_provider) || 'twilio'),
-      status: state.smsSequences.some(s => s.active) ? 'active' : 'standby',
-      desc: 'Manages multi-step SMS drip sequences for new and existing leads. Handles opt-outs automatically and respects sending windows.',
-      stats: [
-        { value: state.smsSequences.length, label: 'Active Sequences' },
-        { value: state.smsSequences.filter(s => s.completed).length, label: 'Completed' },
-        { value: state.smsSequences.filter(s => s.opted_out).length, label: 'Opted Out' }
-      ],
-      lastActivity: state.smsSequences.length > 0 ? state.smsSequences[0].created_at : null
-    },
-    {
-      name: 'Lead Intake',
-      provider: 'Webhook',
-      status: state.leads.length > 0 ? 'active' : 'standby',
-      desc: 'Processes incoming lead submissions from the website form and Intercom. Scores leads, enriches data, and triggers automated follow-ups.',
-      stats: [
-        { value: state.leads.length, label: 'Total Leads' },
-        { value: state.leads.filter(l => l.status === 'new').length, label: 'New' },
-        { value: state.leads.filter(l => l.score === 'hot').length, label: 'Hot Leads' }
-      ],
-      lastActivity: state.leads.length > 0 ? state.leads[state.leads.length - 1].created_at : null
-    },
-    {
-      name: 'Appointment Scheduler',
-      provider: 'Internal',
-      status: state.appointments.length > 0 ? 'active' : 'standby',
-      desc: 'Handles appointment booking, confirmation, rescheduling, and cancellation. Sends reminders via email and SMS before scheduled visits.',
-      stats: [
-        { value: state.appointments.length, label: 'Total Booked' },
-        { value: state.appointments.filter(a => a.status === 'confirmed').length, label: 'Confirmed' },
-        { value: dashboard ? dashboard.appointments.today : 0, label: 'Today' }
-      ],
-      lastActivity: state.appointments.length > 0 ? state.appointments[0].created_at : null
-    },
-    {
-      name: 'Background Scheduler',
-      provider: 'APScheduler',
-      status: (scheduler && scheduler.running) ? 'active' : 'stopped',
-      desc: 'Runs periodic background jobs including SMS sequence processing, email sequence processing, session cleanup, and appointment reminders on configured schedules.',
-      stats: [
-        { value: (scheduler && scheduler.jobs) ? scheduler.jobs.length : 0, label: 'Scheduled Jobs' },
-        { value: scheduler && scheduler.running ? 1 : 0, label: 'Running' }
-      ],
-      lastActivity: dashboard ? dashboard.generated_at : null,
-      jobs: (scheduler && scheduler.jobs) ? scheduler.jobs : []
-    },
-    {
-      name: 'Content Generator',
-      icon: 'edit-3',
-      provider: 'OpenAI / Internal',
-      status: 'standby',
-      desc: 'AI-powered blog and social media content generator. Produces weekly SEO blog posts, Google Ads copy, and Instagram captions aligned with the CrystalFlow content calendar.',
-      stats: [
-        { value: '--', label: 'Posts This Week' },
-        { value: '--', label: 'Next Scheduled' },
-        { value: '--', label: 'Approval Queue' }
-      ],
-      lastActivity: null
-    },
-    {
-      name: 'Social Media Poster',
-      icon: 'share-2',
-      provider: 'Facebook / Meta API',
-      status: 'standby',
-      desc: 'Schedules and publishes approved content to Facebook and Instagram. Manages post queue, monitors engagement, and syncs with the content calendar.',
-      stats: [
-        { value: '--', label: 'Posts This Month' },
-        { value: '--', label: 'Scheduled Queue' },
-        { value: '--', label: 'Last Post' }
-      ],
-      lastActivity: null
-    },
-    {
-      name: 'Instagram Lead Bot',
-      icon: 'message-circle',
-      provider: 'ManyChat AI (Pro)',
-      status: 'active',
-      desc: 'AI-powered Instagram DM automation via ManyChat. Uses knowledge base to answer questions, qualify leads, capture emails, and drive prospects to book free water tests via Calendly.',
-      stats: [
-        { value: '--', label: 'DMs Handled' },
-        { value: '--', label: 'Leads Captured' },
-        { value: '--', label: 'Conversion Rate' }
-      ],
-      lastActivity: null
-    },
-    {
-      name: 'Email Automation',
-      icon: 'zap',
-      provider: 'Internal',
-      status: 'active',
-      desc: 'Drip sequence: immediate welcome confirmation, Day 1 education (Miami water quality), Day 3 social proof, Day 7 limited-time installation offer.',
-      stats: [
-        { value: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? (b.stats.active_sequences || 0) : '--'; })(), label: 'Active Sequences' },
-        { value: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? (b.stats.emails_this_week || 0) : '--'; })(), label: 'Emails This Week' },
-        { value: '--', label: 'Open Rate' }
-      ],
-      lastActivity: (function(){ const b = botsApiData.find(b => b.id === 'email_automation'); return b ? b.last_activity : null; })()
-    },
-    {
-      name: 'SEO Bot',
-      icon: 'search',
-      provider: 'Internal',
-      status: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? b.status : 'active'; })(),
-      desc: 'Automated SEO analysis, keyword research, competitor monitoring, Google Business Profile optimization, and schema markup generation for the Miami water treatment market.',
-      stats: [
-        { value: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? (b.stats.total_reports || 0) : '--'; })(), label: 'Reports' },
-        { value: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? (b.stats.keywords_tracked || 0) : '--'; })(), label: 'Keywords Tracked' },
-        { value: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? (b.stats.total_gbp_posts || 0) : '--'; })(), label: 'GBP Posts' }
-      ],
-      lastActivity: (function(){ const b = botsApiData.find(b => b.id === 'seo_bot'); return b ? b.last_activity : null; })()
-    }
-  ];
-
-  const container = document.getElementById('bot-grid');
-  container.innerHTML = bots.map(bot => {
-    let jobsHtml = '';
-    if (bot.jobs && bot.jobs.length > 0) {
-      jobsHtml = '<div class="job-list">' +
-        bot.jobs.map(j => `
-          <div class="job-item">
-            <span class="job-name">${escapeHtml(j.name)}</span>
-            <span class="job-next-run">${j.next_run ? timeAgo(j.next_run) : '--'}</span>
-          </div>
-        `).join('') + '</div>';
-    }
-
-    return `
-      <div class="bot-full-card">
-        <div class="bot-full-header">
-          <div class="bot-full-status ${bot.status}"></div>
-          <div class="bot-full-name">${escapeHtml(bot.name)}</div>
-          <div class="bot-full-provider">${escapeHtml(bot.provider)}</div>
-        </div>
-        <div class="bot-full-desc">${escapeHtml(bot.desc)}</div>
-        <div class="bot-full-stats">
-          ${bot.stats.map(s => `
-            <div class="bot-full-stat">
-              <div class="bot-full-stat-value">${s.value}</div>
-              <div class="bot-full-stat-label">${s.label}</div>
-            </div>
-          `).join('')}
-        </div>
-        ${jobsHtml}
-        <div class="bot-full-footer">
-          <span>Status: ${capitalize(bot.status)}</span>
-          <span>Last activity: ${bot.lastActivity ? timeAgo(bot.lastActivity) : 'Never'}</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-/* ========================================
-   SEO QUICK ACTIONS
-   ======================================== */
-async function runSeoAudit() {
-  const btn = event.target.closest('button');
-  const origText = btn.textContent;
-  btn.textContent = 'Running...';
-  btn.disabled = true;
-  try {
-    const result = await apiFetch('/api/bots/seo/audit', { method: 'POST' });
-    if (result) {
-      alert('SEO Audit complete. Score: ' + (result.score || '--') + '/100\n\nCheck the SEO Report for full details.');
-    } else {
-      alert('SEO audit triggered. Results will be available in the SEO Report shortly.');
-    }
-  } catch(e) {
-    alert('Could not connect to the backend API. Make sure the server is running.');
-  }
-  btn.textContent = origText;
-  btn.disabled = false;
-}
-
-async function viewSeoReport() {
-  try {
-    const result = await apiFetch('/api/bots/seo/report');
-    if (result && result.report) {
-      const r = result.report;
-      let msg = 'SEO AUDIT REPORT\n';
-      msg += '================\n\n';
-      msg += 'Overall Score: ' + (r.score || '--') + '/100\n';
-      msg += 'Last Audit: ' + (r.last_audit || '--') + '\n\n';
-      if (r.issues && r.issues.length > 0) {
-        msg += 'Issues Found:\n';
-        r.issues.forEach((issue, i) => { msg += (i+1) + '. ' + issue + '\n'; });
-      }
-      if (r.recommendations && r.recommendations.length > 0) {
-        msg += '\nRecommendations:\n';
-        r.recommendations.forEach((rec, i) => { msg += (i+1) + '. ' + rec + '\n'; });
-      }
-      alert(msg);
-    } else {
-      alert('No SEO report available yet. Run an audit first.');
-    }
-  } catch(e) {
-    alert('Could not fetch SEO report. Make sure the backend API is running.');
-  }
-}
-
-async function viewKeywordTracker() {
-  try {
-    const result = await apiFetch('/api/bots/seo/keywords');
-    if (result && result.keywords && result.keywords.length > 0) {
-      let msg = 'KEYWORD TRACKER\n';
-      msg += '===============\n\n';
-      result.keywords.forEach((kw, i) => {
-        msg += (i+1) + '. ' + kw.keyword + ' — Position: ' + (kw.position || '--') + ', Volume: ' + (kw.volume || '--') + '\n';
-      });
-      alert(msg);
-    } else {
-      alert('No keywords tracked yet. Add keywords via the SEO Bot page.');
-    }
-  } catch(e) {
-    alert('Could not fetch keyword data. Make sure the backend API is running.');
-  }
-}
-
-/* ========================================
-   SETTINGS PAGE
-   ======================================== */
-async function loadSettingsPage() {
-  const health = await loadHealth();
-
-  const container = document.getElementById('settings-grid');
-
-  const businessInfo = `
-    <div class="settings-section">
-      <div class="settings-section-title">Business Information</div>
-      <div class="settings-row">
-        <span class="settings-label">Business Name</span>
-        <span class="settings-value">${escapeHtml(health ? health.business : 'CrystalFlow Miami')}</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Email</span>
-        <span class="settings-value">hello@crystalflowmiami.com</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Phone</span>
-        <span class="settings-value">(786) 947-3824</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Business Hours</span>
-        <span class="settings-value">Mon-Sat 8AM-6PM EST</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">System Status</span>
-        <span class="settings-value"><span class="badge badge-active">${health ? capitalize(health.status) : 'Unknown'}</span></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">API Version</span>
-        <span class="settings-value">${health ? health.version : '--'}</span>
-      </div>
-    </div>
-  `;
-
-  const services = `
-    <div class="settings-section">
-      <div class="settings-section-title">Connected Services</div>
-      <div class="settings-row">
-        <span class="settings-label">Email Provider</span>
-        <span class="settings-value"><span class="badge badge-active">${capitalize(health ? health.email_provider : 'unknown')}</span></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">SMS Provider</span>
-        <span class="settings-value"><span class="badge badge-active">${capitalize(health ? health.sms_provider : 'unknown')}</span></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Scheduler</span>
-        <span class="settings-value"><span class="badge ${health && health.scheduler && health.scheduler.running ? 'badge-active' : 'badge-failed'}">${health && health.scheduler && health.scheduler.running ? 'Running' : 'Stopped'}</span></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Database</span>
-        <span class="settings-value"><span class="badge badge-active">Connected</span></span>
-      </div>
-    </div>
-  `;
-
-  const apiRef = `
-    <div class="settings-section">
-      <div class="settings-section-title">API Reference</div>
-      <div class="settings-row">
-        <span class="settings-label">Base URL</span>
-        <span class="settings-value"><code>${API}</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Dashboard</span>
-        <span class="settings-value"><code>GET /api/dashboard</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Leads</span>
-        <span class="settings-value"><code>GET /api/leads</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Appointments</span>
-        <span class="settings-value"><code>GET /api/appointments</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Email Log</span>
-        <span class="settings-value"><code>GET /api/email/log</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">SMS Sequences</span>
-        <span class="settings-value"><code>GET /api/sms/sequences</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Email Automation</span>
-        <span class="settings-value"><code>GET /api/email/automation/sequences</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Bot Status</span>
-        <span class="settings-value"><code>GET /api/bots/status</code></span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Health</span>
-        <span class="settings-value"><code>GET /api/health</code></span>
-      </div>
-    </div>
-  `;
-
-  const schedulerJobs = health && health.scheduler && health.scheduler.jobs ? `
-    <div class="settings-section">
-      <div class="settings-section-title">Scheduled Jobs</div>
-      ${health.scheduler.jobs.map(j => `
-        <div class="settings-row">
-          <span class="settings-label">${escapeHtml(j.name)}</span>
-          <span class="settings-value">${j.next_run ? timeAgo(j.next_run) : '--'}</span>
-        </div>
-      `).join('')}
-    </div>
-  ` : '';
-
-  container.innerHTML = businessInfo + services + apiRef + schedulerJobs;
-}
-
-/* ========================================
-   MODAL HELPERS
-   ======================================== */
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-
-// Close modal on Escape
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
-    closeLeadDetail();
-  }
-});
-
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === overlay) {
-      overlay.classList.remove('open');
-    }
-  });
-});
-
-/* ========================================
-   SIDEBAR COLLAPSE
-   ======================================== */
-function toggleSidebar() {
-  const dash = document.getElementById('dashboard');
-  dash.classList.toggle('collapsed');
-  const icon = document.getElementById('collapse-icon');
-  if (dash.classList.contains('collapsed')) {
-    icon.innerHTML = '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>';
-  } else {
-    icon.innerHTML = '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
-  }
-}
-
-/* ========================================
-   INITIALIZATION
-   ======================================== */
-function init() {
-  // Route from hash
-  const hash = window.location.hash.replace('#', '') || 'command-center';
-  const validPages = ['command-center', 'tasks', 'leads', 'appointments', 'messages', 'bots', 'settings'];
-  const page = validPages.includes(hash) ? hash : 'command-center';
-  navigate(page);
-
-  // Also prefetch health for bot status
-  loadHealth();
-}
-
-window.addEventListener('hashchange', function() {
-  const hash = window.location.hash.replace('#', '') || 'command-center';
-  if (hash !== state.currentPage) navigate(hash);
-});
-
-// Start the app
-init();
-</script>
+<!-- Footer attribution -->
+<footer style="position: fixed; bottom: 0; right: 0; padding: 4px 12px; font-size: 10px; color: var(--color-text-faint); z-index: 50;">
+  <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none; opacity: 0.6;">
+    Created with Perplexity Computer
+  </a>
+</footer>
+
+<script src="./app.js"></script>
 </body>
 </html>
