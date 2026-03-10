@@ -98,6 +98,10 @@
       }).then(function (data) {
         authToken = data.access_token;
         localStorage.setItem("cf_portal_token", authToken);
+        if (data.customer) {
+          currentCustomer = data.customer;
+          populateProfile(data.customer);
+        }
         loadCustomerData();
         showPortal();
       }).catch(function (err) {
@@ -125,14 +129,23 @@
       if (submitBtn) { submitBtn.textContent = "Creating account..."; submitBtn.disabled = true; }
       if (registerError) registerError.style.display = "none";
 
+      var nameParts = nameEl.value.trim().split(" ");
+      var firstName = nameParts[0] || "";
+      var lastName = nameParts.slice(1).join(" ") || "";
+
       apiPortalPost("/api/portal/register", {
-        name: nameEl.value,
+        first_name: firstName,
+        last_name: lastName || firstName,
         email: emailEl.value,
         phone: phoneEl ? phoneEl.value : "",
         password: passEl.value
       }).then(function (data) {
         authToken = data.access_token;
         localStorage.setItem("cf_portal_token", authToken);
+        if (data.customer) {
+          currentCustomer = data.customer;
+          populateProfile(data.customer);
+        }
         loadCustomerData();
         showPortal();
       }).catch(function (err) {
@@ -202,12 +215,14 @@
     var avatarEl = document.querySelector(".profile-avatar");
     var greetingEl = document.getElementById("portalGreetingName");
 
-    if (nameEl) nameEl.textContent = customer.name || "Customer";
+    var fullName = (customer.first_name || "") + " " + (customer.last_name || "");
+    fullName = fullName.trim() || "Customer";
+    if (nameEl) nameEl.textContent = fullName;
     if (emailEl) emailEl.textContent = customer.email || "";
-    if (greetingEl && customer.name) greetingEl.textContent = customer.name.split(" ")[0];
-    if (avatarEl && customer.name) {
-      var parts = customer.name.split(" ");
-      avatarEl.textContent = (parts[0] ? parts[0][0] : "") + (parts[1] ? parts[1][0] : "");
+    if (greetingEl) greetingEl.textContent = customer.first_name || "there";
+    if (avatarEl) {
+      var initials = (customer.first_name ? customer.first_name[0] : "") + (customer.last_name ? customer.last_name[0] : "");
+      avatarEl.textContent = initials.toUpperCase() || "?";
     }
 
     /* Update profile info rows */
@@ -218,8 +233,8 @@
       if (!label || !value) return;
       var labelText = label.textContent.toLowerCase();
       if (labelText === "phone") value.textContent = customer.phone || "Not provided";
-      else if (labelText === "address") value.textContent = customer.address || "Not provided";
-      else if (labelText === "package") value.textContent = customer.package_name || "Pending";
+      else if (labelText === "address") value.textContent = (customer.address || "Not provided") + (customer.zip_code ? ", " + customer.zip_code : "");
+      else if (labelText === "package") value.textContent = customer.package_installed || "Pending";
       else if (labelText.indexOf("install") >= 0) value.textContent = customer.install_date || "Not scheduled";
     });
   }
@@ -418,8 +433,9 @@
       if (submitBtn) { submitBtn.textContent = "Submitting..."; submitBtn.disabled = true; }
 
       apiPortalPost("/api/portal/service-requests", {
-        request_type: typeEl ? typeEl.value : "general",
-        description: descEl ? descEl.value : ""
+        category: typeEl ? typeEl.value : "general",
+        description: descEl ? descEl.value : "Service request",
+        priority: "medium"
       }).then(function () {
         if (serviceFormCard) serviceFormCard.style.display = "none";
         if (serviceSuccess) serviceSuccess.classList.add("visible");
