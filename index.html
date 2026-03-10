@@ -915,10 +915,14 @@
     <!-- ============================== -->
     <section class="view" id="view-email">
       <p class="automations-subtitle">Active email sequences and automation status</p>
-      <div class="sequence-controls">
+      <div class="sequence-controls" style="display:flex;gap:var(--space-3);">
         <button class="btn btn-primary" id="refreshEmailBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
           Refresh
+        </button>
+        <button class="btn" id="openEmailBotFromCampaigns" style="background:linear-gradient(135deg,var(--color-cyan),var(--color-violet));color:#fff;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z"/></svg>
+          Email Bot
         </button>
       </div>
       <div class="sequences-list" id="emailSequencesList">

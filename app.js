@@ -31,8 +31,8 @@
     dispatch: "New Job",
     warranty: "+ New Claim",
     automations: "+ New Automation",
-    email: "Refresh",
-    sms: "Refresh",
+    email: "Compose Email",
+    sms: "Compose Email",
     settings: "",
   };
 
@@ -719,15 +719,7 @@
   if (closeAddBtn) closeAddBtn.addEventListener("click", closeAddModal);
   if (cancelAddBtn) cancelAddBtn.addEventListener("click", closeAddModal);
 
-  // Also wire the header CTA to open add modal when on accounts view
-  if (headerCTA) {
-    headerCTA.addEventListener("click", function () {
-      var currentView = document.querySelector(".nav-item.active");
-      if (currentView && currentView.dataset.view === "portal") {
-        openAddModal();
-      }
-    });
-  }
+  /* headerCTA routing handled in consolidated handler below */
 
   if (addForm) {
     addForm.addEventListener("submit", function (e) {
@@ -1208,20 +1200,28 @@
       var activeView = document.querySelector(".view.active");
       if (!activeView) return;
       var viewId = activeView.id.replace("view-", "");
+
       if (viewId === "dashboard") {
-        /* Open new lead form or redirect */
         var name = prompt("Lead name:");
         if (name) {
           apiPost("/api/leads", { name: name, source: "direct", status: "new" })
             .then(function () {
-              alert("Lead created! Refreshing dashboard...");
               dashboardLoaded = false;
               loadDashboard();
+              loadLeadsTable();
             })
             .catch(function () { alert("Failed to create lead."); });
         }
-      } else {
-        alert(ctaLabels[viewId] + " — coming soon!");
+      } else if (viewId === "portal") {
+        openAddModal();
+      } else if (viewId === "warranty") {
+        openNewWarrantyModal();
+      } else if (viewId === "email" || viewId === "sms") {
+        if (typeof openEmailBotModal === "function") openEmailBotModal();
+      } else if (viewId === "quote") {
+        /* Scroll to quote summary or trigger email of quote */
+        var quoteResult = document.getElementById("quoteResult");
+        if (quoteResult) quoteResult.scrollIntoView({ behavior: "smooth" });
       }
     });
   }
@@ -1821,16 +1821,6 @@
 
   if (closeEbBtn) closeEbBtn.addEventListener("click", closeEmailBotModal);
 
-  /* Also wire the headerCTA to open email bot when on warranty view */
-  if (headerCTA) {
-    headerCTA.addEventListener("click", function () {
-      var currentView = document.querySelector(".view.active");
-      if (currentView && currentView.id === "view-warranty") {
-        openNewWarrantyModal();
-      }
-    });
-  }
-
   /* Recipient type toggle — reload dropdown */
   var ebRecipientType = document.getElementById("ebRecipientType");
   if (ebRecipientType) {
@@ -1968,6 +1958,12 @@
 
   /* Open Email Bot from the sidebar or toolbar (add a global hook) */
   window._openEmailBot = openEmailBotModal;
+
+  /* Email Bot button inside Email Campaigns view */
+  var ebFromCampaignsBtn = document.getElementById("openEmailBotFromCampaigns");
+  if (ebFromCampaignsBtn) {
+    ebFromCampaignsBtn.addEventListener("click", openEmailBotModal);
+  }
 
   /* ===== INITIAL LOAD ===== */
   if (!window.location.hash || window.location.hash === "#dashboard") {
