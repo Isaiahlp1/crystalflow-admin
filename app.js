@@ -17,6 +17,7 @@
     quote: "Instant Quote Calculator",
     portal: "Accounts",
     dispatch: "Technician Dispatch",
+    warranty: "Warranty Claims",
     automations: "Automations",
     email: "Email Campaigns",
     sms: "SMS Drips",
@@ -28,6 +29,7 @@
     quote: "Send Quote",
     portal: "+ Add Customer",
     dispatch: "New Job",
+    warranty: "+ New Claim",
     automations: "+ New Automation",
     email: "Refresh",
     sms: "Refresh",
@@ -69,6 +71,9 @@
     }
     if (viewId === "sms") {
       loadSmsSequences();
+    }
+    if (viewId === "warranty") {
+      loadWarrantyClaims();
     }
     if (viewId === "settings") {
       checkSystemHealth();
@@ -1474,6 +1479,495 @@
         if (dbStatus) dbStatus.textContent = "Unreachable";
       });
   }
+
+  /* ===== WARRANTY CLAIMS ===== */
+  var allWarrantyClaims = [];
+  var currentWarrantyClaim = null;
+
+  function apiPut(path, body) {
+    return fetch(API_BASE + path, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("API error: " + r.status);
+      return r.json();
+    });
+  }
+
+  function loadWarrantyClaims() {
+    var tbody = document.getElementById("warrantyTableBody");
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">Loading warranty claims...</td></tr>';
+
+    var statusFilter = document.getElementById("warrantyStatusFilter");
+    var filterVal = statusFilter ? statusFilter.value : "";
+    var url = "/api/admin/warranty-claims";
+    if (filterVal) url += "?status_filter=" + filterVal;
+
+    api(url)
+      .then(function (data) {
+        allWarrantyClaims = data.warranty_claims || [];
+        var badge = document.getElementById("warrantyBadge");
+        if (badge) badge.textContent = data.total || allWarrantyClaims.length;
+        renderWarrantyTable(allWarrantyClaims);
+      })
+      .catch(function () {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">No warranty claims found</td></tr>';
+      });
+  }
+
+  function renderWarrantyTable(claims) {
+    var tbody = document.getElementById("warrantyTableBody");
+    if (!tbody) return;
+
+    if (!claims || claims.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;color:var(--color-text-faint);display:block;margin:0 auto var(--space-2);">' +
+        '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+        'No warranty claims yet</td></tr>';
+      return;
+    }
+
+    var html = '';
+    claims.forEach(function (claim) {
+      var created = claim.created_at ? new Date(claim.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "--";
+      var statusBadgeClass = getWarrantyStatusBadge(claim.status);
+      var priorityBadgeClass = getPriorityBadge(claim.priority);
+      var categoryLabel = (claim.category || "other").replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+
+      html += '<tr class="clickable-row" data-claim-id="' + claim.id + '">' +
+        '<td style="font-weight:500;color:var(--color-cyan);">' + (claim.claim_number || "--") + '</td>' +
+        '<td>' + (claim.customer_name || "Unknown") + '</td>' +
+        '<td>' + categoryLabel + '</td>' +
+        '<td><span class="badge ' + priorityBadgeClass + '">' + (claim.priority || "medium") + '</span></td>' +
+        '<td><span class="badge ' + statusBadgeClass + '">' + formatStatus(claim.status) + '</span></td>' +
+        '<td>' + created + '</td>' +
+        '<td>' + (claim.assigned_tech || '<span style="color:var(--color-text-faint);">Unassigned</span>') + '</td>' +
+        '<td><button class="btn-icon" title="View Details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M9 18l6-6-6-6"/></svg></button></td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+
+    tbody.querySelectorAll(".clickable-row").forEach(function (row) {
+      row.addEventListener("click", function () {
+        var claimId = parseInt(row.dataset.claimId);
+        openWarrantyDetail(claimId);
+      });
+    });
+  }
+
+  function getWarrantyStatusBadge(status) {
+    var map = {
+      submitted: "badge-new",
+      under_review: "badge-contacted",
+      approved: "badge-qualified",
+      in_progress: "badge-scheduled",
+      parts_ordered: "badge-contacted",
+      scheduled: "badge-scheduled",
+      resolved: "badge-completed",
+      denied: "badge-lost",
+      closed: "badge-completed",
+    };
+    return map[status] || "badge-pending";
+  }
+
+  function getPriorityBadge(priority) {
+    var map = {
+      low: "badge-completed",
+      medium: "badge-contacted",
+      high: "badge-scheduled",
+      urgent: "badge-lost",
+    };
+    return map[priority] || "badge-pending";
+  }
+
+  function formatStatus(status) {
+    if (!status) return "--";
+    return status.replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+
+  function openWarrantyDetail(claimId) {
+    var claim = allWarrantyClaims.find(function (c) { return c.id === claimId; });
+    if (!claim) return;
+    currentWarrantyClaim = claim;
+
+    document.getElementById("wcDetailClaim").textContent = claim.claim_number || "--";
+    document.getElementById("wcDetailCustomer").textContent = (claim.customer_name || "Unknown") + (claim.customer_email ? " (" + claim.customer_email + ")" : "");
+    document.getElementById("wcDetailCategory").textContent = formatStatus(claim.category);
+    document.getElementById("wcDetailPriority").textContent = claim.priority || "medium";
+    document.getElementById("wcDetailEquipment").textContent = claim.equipment_affected || "--";
+    document.getElementById("wcDetailPlan").textContent = claim.warranty_plan_at_claim || "standard";
+    document.getElementById("wcDetailExpiry").textContent = claim.warranty_expiry_at_claim ? new Date(claim.warranty_expiry_at_claim).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "--";
+    document.getElementById("wcDetailCreated").textContent = claim.created_at ? new Date(claim.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "--";
+    document.getElementById("wcDetailDescription").textContent = claim.description || "No description provided.";
+
+    var statusSelect = document.getElementById("wcUpdateStatus");
+    if (statusSelect) statusSelect.value = claim.status || "submitted";
+
+    var techSelect = document.getElementById("wcUpdateTech");
+    if (techSelect) techSelect.value = claim.assigned_tech || "";
+
+    var notesField = document.getElementById("wcUpdateNotes");
+    if (notesField) notesField.value = claim.resolution_notes || "";
+
+    document.getElementById("warrantyDetailOverlay").classList.add("open");
+    document.getElementById("warrantyDetailPanel").classList.add("open");
+  }
+
+  function closeWarrantyDetail() {
+    document.getElementById("warrantyDetailOverlay").classList.remove("open");
+    document.getElementById("warrantyDetailPanel").classList.remove("open");
+    currentWarrantyClaim = null;
+  }
+
+  var closeWcBtn = document.getElementById("closeWarrantyDetailBtn");
+  var wcOverlay = document.getElementById("warrantyDetailOverlay");
+  if (closeWcBtn) closeWcBtn.addEventListener("click", closeWarrantyDetail);
+  if (wcOverlay) wcOverlay.addEventListener("click", closeWarrantyDetail);
+
+  /* Save warranty claim changes */
+  var wcSaveBtn = document.getElementById("wcSaveBtn");
+  if (wcSaveBtn) {
+    wcSaveBtn.addEventListener("click", function () {
+      if (!currentWarrantyClaim) return;
+      var payload = {
+        status: document.getElementById("wcUpdateStatus").value,
+        assigned_tech: document.getElementById("wcUpdateTech").value || null,
+        resolution_notes: document.getElementById("wcUpdateNotes").value || null,
+      };
+
+      wcSaveBtn.disabled = true;
+      wcSaveBtn.textContent = "Saving...";
+
+      apiPut("/api/admin/warranty-claims/" + currentWarrantyClaim.id, payload)
+        .then(function () {
+          wcSaveBtn.textContent = "Saved";
+          setTimeout(function () {
+            wcSaveBtn.disabled = false;
+            wcSaveBtn.textContent = "Save Changes";
+          }, 1500);
+          loadWarrantyClaims();
+        })
+        .catch(function () {
+          wcSaveBtn.disabled = false;
+          wcSaveBtn.textContent = "Save Changes";
+          alert("Failed to update warranty claim.");
+        });
+    });
+  }
+
+  /* Email customer from warranty detail */
+  var wcEmailBtn = document.getElementById("wcEmailCustomerBtn");
+  if (wcEmailBtn) {
+    wcEmailBtn.addEventListener("click", function () {
+      if (!currentWarrantyClaim) return;
+      openEmailBotModal();
+      var purposeSelect = document.getElementById("ebPurpose");
+      if (purposeSelect) purposeSelect.value = "warranty_update";
+
+      /* Pre-select the customer */
+      var recipientType = document.getElementById("ebRecipientType");
+      if (recipientType) {
+        recipientType.value = "customer";
+        recipientType.dispatchEvent(new Event("change"));
+      }
+    });
+  }
+
+  /* Warranty status filter change */
+  var wcStatusFilter = document.getElementById("warrantyStatusFilter");
+  if (wcStatusFilter) {
+    wcStatusFilter.addEventListener("change", function () {
+      loadWarrantyClaims();
+    });
+  }
+
+  /* Warranty search */
+  var wcSearchInput = document.getElementById("warrantySearchInput");
+  if (wcSearchInput) {
+    var wcSearchTimeout;
+    wcSearchInput.addEventListener("input", function () {
+      clearTimeout(wcSearchTimeout);
+      wcSearchTimeout = setTimeout(function () {
+        var q = wcSearchInput.value.toLowerCase().trim();
+        if (!q) {
+          renderWarrantyTable(allWarrantyClaims);
+          return;
+        }
+        var filtered = allWarrantyClaims.filter(function (c) {
+          return (c.claim_number || "").toLowerCase().indexOf(q) > -1 ||
+            (c.customer_name || "").toLowerCase().indexOf(q) > -1 ||
+            (c.customer_email || "").toLowerCase().indexOf(q) > -1;
+        });
+        renderWarrantyTable(filtered);
+      }, 300);
+    });
+  }
+
+  /* ===== NEW WARRANTY CLAIM MODAL ===== */
+  var newWcBtn = document.getElementById("newWarrantyClaimBtn");
+  var newWcModal = document.getElementById("newWarrantyModal");
+  var closeNewWcBtn = document.getElementById("closeNewWarrantyBtn");
+  var cancelNewWcBtn = document.getElementById("cancelNewWarrantyBtn");
+  var newWcForm = document.getElementById("newWarrantyForm");
+
+  function openNewWarrantyModal() {
+    if (!newWcModal) return;
+    newWcModal.classList.add("active");
+    populateCustomerDropdown("wcCustSelect");
+  }
+
+  function closeNewWarrantyModal() {
+    if (!newWcModal) return;
+    newWcModal.classList.remove("active");
+    if (newWcForm) newWcForm.reset();
+    var errEl = document.getElementById("newWarrantyError");
+    if (errEl) errEl.style.display = "none";
+  }
+
+  if (newWcBtn) newWcBtn.addEventListener("click", openNewWarrantyModal);
+  if (closeNewWcBtn) closeNewWcBtn.addEventListener("click", closeNewWarrantyModal);
+  if (cancelNewWcBtn) cancelNewWcBtn.addEventListener("click", closeNewWarrantyModal);
+
+  if (newWcForm) {
+    newWcForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var errEl = document.getElementById("newWarrantyError");
+      var submitBtn = document.getElementById("submitNewWarrantyBtn");
+
+      var custId = document.getElementById("wcCustSelect").value;
+      if (!custId) {
+        if (errEl) { errEl.textContent = "Please select a customer."; errEl.style.display = "block"; }
+        return;
+      }
+
+      var payload = {
+        customer_id: parseInt(custId),
+        category: document.getElementById("wcCategory").value,
+        description: document.getElementById("wcDescription").value,
+        equipment_affected: document.getElementById("wcEquipment").value || null,
+        priority: document.getElementById("wcPriority").value,
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Creating...";
+      if (errEl) errEl.style.display = "none";
+
+      apiPost("/api/admin/warranty-claims", payload)
+        .then(function () {
+          closeNewWarrantyModal();
+          loadWarrantyClaims();
+        })
+        .catch(function (err) {
+          if (errEl) { errEl.textContent = "Failed to create claim. " + err.message; errEl.style.display = "block"; }
+        })
+        .finally(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Create Claim";
+        });
+    });
+  }
+
+  /* Shared: populate customer dropdown from API */
+  function populateCustomerDropdown(selectId) {
+    var select = document.getElementById(selectId);
+    if (!select) return;
+
+    /* Keep only the first (placeholder) option */
+    while (select.options.length > 1) select.remove(1);
+
+    api("/api/admin/customers")
+      .then(function (data) {
+        var customers = data.customers || [];
+        customers.forEach(function (c) {
+          var opt = document.createElement("option");
+          opt.value = c.id;
+          opt.textContent = (c.first_name || "") + " " + (c.last_name || "") + " — " + c.email;
+          select.appendChild(opt);
+        });
+      })
+      .catch(function () { /* silently fail */ });
+  }
+
+  /* ===== EMAIL BOT COMPOSE MODAL ===== */
+  var ebModal = document.getElementById("emailBotModal");
+  var closeEbBtn = document.getElementById("closeEmailBotBtn");
+  var ebGenerateBtn = document.getElementById("ebGenerateBtn");
+  var ebSendBtn = document.getElementById("ebSendBtn");
+  var ebRegenerateBtn = document.getElementById("ebRegenerateBtn");
+  var ebPreview = document.getElementById("ebPreview");
+  var ebFooter = document.getElementById("ebFooter");
+  var currentGeneratedEmail = null;
+
+  function openEmailBotModal() {
+    if (!ebModal) return;
+    ebModal.classList.add("active");
+    if (ebPreview) ebPreview.style.display = "none";
+    if (ebFooter) ebFooter.style.display = "none";
+    currentGeneratedEmail = null;
+    populateRecipientDropdown();
+  }
+
+  function closeEmailBotModal() {
+    if (!ebModal) return;
+    ebModal.classList.remove("active");
+    if (ebPreview) ebPreview.style.display = "none";
+    if (ebFooter) ebFooter.style.display = "none";
+    currentGeneratedEmail = null;
+    var errEl = document.getElementById("emailBotError");
+    if (errEl) errEl.style.display = "none";
+  }
+
+  if (closeEbBtn) closeEbBtn.addEventListener("click", closeEmailBotModal);
+
+  /* Also wire the headerCTA to open email bot when on warranty view */
+  if (headerCTA) {
+    headerCTA.addEventListener("click", function () {
+      var currentView = document.querySelector(".view.active");
+      if (currentView && currentView.id === "view-warranty") {
+        openNewWarrantyModal();
+      }
+    });
+  }
+
+  /* Recipient type toggle — reload dropdown */
+  var ebRecipientType = document.getElementById("ebRecipientType");
+  if (ebRecipientType) {
+    ebRecipientType.addEventListener("change", function () {
+      populateRecipientDropdown();
+    });
+  }
+
+  function populateRecipientDropdown() {
+    var typeSelect = document.getElementById("ebRecipientType");
+    var recipientSelect = document.getElementById("ebRecipientSelect");
+    if (!typeSelect || !recipientSelect) return;
+
+    while (recipientSelect.options.length > 1) recipientSelect.remove(1);
+
+    var recipientType = typeSelect.value;
+    if (recipientType === "customer") {
+      api("/api/admin/customers")
+        .then(function (data) {
+          var customers = data.customers || [];
+          customers.forEach(function (c) {
+            var opt = document.createElement("option");
+            opt.value = c.id;
+            opt.textContent = (c.first_name || "") + " " + (c.last_name || "") + " — " + c.email;
+            recipientSelect.appendChild(opt);
+          });
+        })
+        .catch(function () { /* silently fail */ });
+    } else {
+      api("/api/leads")
+        .then(function (data) {
+          var leads = data.leads || data || [];
+          leads.forEach(function (l) {
+            var opt = document.createElement("option");
+            opt.value = l.id;
+            opt.textContent = (l.name || "Lead #" + l.id) + (l.email ? " — " + l.email : "");
+            recipientSelect.appendChild(opt);
+          });
+        })
+        .catch(function () { /* silently fail */ });
+    }
+  }
+
+  /* Generate email */
+  if (ebGenerateBtn) {
+    ebGenerateBtn.addEventListener("click", function () {
+      var recipientType = document.getElementById("ebRecipientType").value;
+      var recipientId = document.getElementById("ebRecipientSelect").value;
+      var purpose = document.getElementById("ebPurpose").value;
+      var tone = document.getElementById("ebTone").value;
+      var customInstructions = document.getElementById("ebCustomInstructions").value;
+      var errEl = document.getElementById("emailBotError");
+
+      if (!recipientId) {
+        if (errEl) { errEl.textContent = "Please select a recipient."; errEl.style.display = "block"; }
+        return;
+      }
+      if (errEl) errEl.style.display = "none";
+
+      ebGenerateBtn.disabled = true;
+      ebGenerateBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;animation:spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Generating...';
+
+      apiPost("/api/admin/email-bot/generate", {
+        recipient_type: recipientType,
+        recipient_id: parseInt(recipientId),
+        email_purpose: purpose,
+        tone: tone,
+        custom_instructions: customInstructions,
+      })
+        .then(function (data) {
+          currentGeneratedEmail = data;
+          document.getElementById("ebToEmail").value = data.recipient_email || "";
+          document.getElementById("ebSubject").value = data.subject || "";
+          document.getElementById("ebBodyPreview").innerHTML = data.body_html || data.body_text || "";
+
+          if (ebPreview) ebPreview.style.display = "block";
+          if (ebFooter) ebFooter.style.display = "flex";
+        })
+        .catch(function (err) {
+          if (errEl) { errEl.textContent = "Failed to generate email. " + err.message; errEl.style.display = "block"; }
+        })
+        .finally(function () {
+          ebGenerateBtn.disabled = false;
+          ebGenerateBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z"/></svg> Generate Email';
+        });
+    });
+  }
+
+  /* Regenerate = same as generate */
+  if (ebRegenerateBtn) {
+    ebRegenerateBtn.addEventListener("click", function () {
+      if (ebGenerateBtn) ebGenerateBtn.click();
+    });
+  }
+
+  /* Send email */
+  if (ebSendBtn) {
+    ebSendBtn.addEventListener("click", function () {
+      if (!currentGeneratedEmail) return;
+      var errEl = document.getElementById("emailBotError");
+
+      var toEmail = document.getElementById("ebToEmail").value;
+      var subject = document.getElementById("ebSubject").value;
+      var bodyHtml = document.getElementById("ebBodyPreview").innerHTML;
+
+      if (!toEmail || !subject) {
+        if (errEl) { errEl.textContent = "Recipient email and subject are required."; errEl.style.display = "block"; }
+        return;
+      }
+
+      ebSendBtn.disabled = true;
+      ebSendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;animation:spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/></svg> Sending...';
+
+      apiPost("/api/admin/email-bot/send", {
+        to_email: toEmail,
+        to_name: currentGeneratedEmail.recipient_name || "",
+        subject: subject,
+        body_html: bodyHtml,
+      })
+        .then(function () {
+          ebSendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg> Sent';
+          setTimeout(function () {
+            closeEmailBotModal();
+            ebSendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Send Email';
+            ebSendBtn.disabled = false;
+          }, 1500);
+        })
+        .catch(function (err) {
+          if (errEl) { errEl.textContent = "Failed to send. " + err.message; errEl.style.display = "block"; }
+          ebSendBtn.disabled = false;
+          ebSendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Send Email';
+        });
+    });
+  }
+
+  /* Open Email Bot from the sidebar or toolbar (add a global hook) */
+  window._openEmailBot = openEmailBotModal;
 
   /* ===== INITIAL LOAD ===== */
   if (!window.location.hash || window.location.hash === "#dashboard") {
