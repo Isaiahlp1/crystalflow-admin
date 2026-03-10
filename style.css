@@ -1836,6 +1836,176 @@ html, body { height: 100%; overflow: hidden; margin: 0; }
   color: var(--color-text-faint);
 }
 
+/* ===== SEQUENCE CARDS (Email / SMS) ===== */
+.sequence-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.sequences-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sequence-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition-interactive);
+}
+
+.sequence-card:hover {
+  border-color: var(--color-border);
+}
+
+.sequence-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.sequence-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sequence-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sequence-card-icon.email {
+  background: var(--color-violet-glow);
+  color: var(--color-violet);
+}
+
+.sequence-card-icon.sms {
+  background: var(--color-cyan-glow);
+  color: var(--color-cyan);
+}
+
+.sequence-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sequence-card-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sequence-card-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.sequence-card-body {
+  padding: var(--space-4) var(--space-5);
+}
+
+.sequence-card-footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ===== SETTINGS VIEW ===== */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--space-4);
+}
+
+.settings-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.settings-card-body {
+  padding: var(--space-4) var(--space-5);
+}
+
+.settings-connection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.settings-connection:last-child {
+  border-bottom: none;
+}
+
+.settings-conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--color-text-faint);
+}
+
+.settings-conn-dot.connected {
+  background: var(--color-success);
+}
+
+.settings-conn-dot.disconnected {
+  background: var(--color-error);
+}
+
+/* ===== DELETE LEAD BUTTON ===== */
+.delete-lead-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-faint);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-interactive), background var(--transition-interactive);
+}
+
+.delete-lead-btn:hover {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.delete-lead-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .app { grid-template-columns: 1fr; }
@@ -1854,8 +2024,16 @@ html, body { height: 100%; overflow: hidden; margin: 0; }
   .form-radio-group { grid-template-columns: 1fr; }
   .header-search { display: none; }
   .automations-grid { grid-template-columns: 1fr; }
+  .settings-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
   .kpi-grid { grid-template-columns: 1fr; }
 }
+
+/* Spinner animation for loading states */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin { animation: spin 1s linear infinite; }

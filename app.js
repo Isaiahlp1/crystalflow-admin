@@ -18,6 +18,9 @@
     portal: "Accounts",
     dispatch: "Technician Dispatch",
     automations: "Automations",
+    email: "Email Campaigns",
+    sms: "SMS Drips",
+    settings: "Settings",
   };
 
   var ctaLabels = {
@@ -26,6 +29,9 @@
     portal: "+ Add Customer",
     dispatch: "New Job",
     automations: "+ New Automation",
+    email: "Refresh",
+    sms: "Refresh",
+    settings: "",
   };
 
   var dispatchMapInitialized = false;
@@ -57,6 +63,15 @@
     }
     if (viewId === "portal") {
       loadPortalCustomers();
+    }
+    if (viewId === "email") {
+      loadEmailSequences();
+    }
+    if (viewId === "sms") {
+      loadSmsSequences();
+    }
+    if (viewId === "settings") {
+      checkSystemHealth();
     }
   }
 
@@ -576,6 +591,7 @@
   var closeDetailBtn = document.getElementById("closeDetailBtn");
 
   function openAccountDetail(cust) {
+    currentDetailCustomerId = cust.id;
     document.getElementById("detailAvatar").textContent = getInitials(cust.first_name, cust.last_name);
     document.getElementById("detailName").textContent = ((cust.first_name || "") + " " + (cust.last_name || "")).trim() || "Unknown";
     document.getElementById("detailEmail").textContent = cust.email || "--";
@@ -757,6 +773,88 @@
     statusFilter.addEventListener("change", function () { renderAccountsTable(allCustomers); });
   }
 
+  /* ===== INVOICE CREATION MODAL ===== */
+  var invoiceModal = document.getElementById("invoiceModal");
+  var closeInvoiceModalBtn = document.getElementById("closeInvoiceModalBtn");
+  var cancelInvoiceBtn = document.getElementById("cancelInvoiceBtn");
+  var createInvoiceForm = document.getElementById("createInvoiceForm");
+  var createInvoiceError = document.getElementById("createInvoiceError");
+  var invoiceCustSelect = document.getElementById("invoiceCustSelect");
+  var createInvoiceForCustBtn = document.getElementById("createInvoiceForCustomerBtn");
+  var currentDetailCustomerId = null;
+
+  function openInvoiceModal(preselectedCustId) {
+    if (!invoiceModal) return;
+    if (createInvoiceError) { createInvoiceError.style.display = "none"; }
+    if (createInvoiceForm) createInvoiceForm.reset();
+
+    // Populate customer dropdown
+    if (invoiceCustSelect && allCustomers.length > 0) {
+      invoiceCustSelect.innerHTML = '<option value="">Select a customer...</option>';
+      allCustomers.forEach(function (c) {
+        var name = ((c.first_name || "") + " " + (c.last_name || "")).trim() || c.email;
+        invoiceCustSelect.innerHTML += '<option value="' + c.id + '">' + name + ' (' + (c.email || "") + ')</option>';
+      });
+      if (preselectedCustId) {
+        invoiceCustSelect.value = String(preselectedCustId);
+      }
+    }
+    invoiceModal.classList.add("open");
+  }
+
+  function closeInvoiceModal() {
+    if (invoiceModal) invoiceModal.classList.remove("open");
+  }
+
+  if (closeInvoiceModalBtn) closeInvoiceModalBtn.addEventListener("click", closeInvoiceModal);
+  if (cancelInvoiceBtn) cancelInvoiceBtn.addEventListener("click", closeInvoiceModal);
+
+  if (createInvoiceForCustBtn) {
+    createInvoiceForCustBtn.addEventListener("click", function () {
+      openInvoiceModal(currentDetailCustomerId);
+    });
+  }
+
+  if (createInvoiceForm) {
+    createInvoiceForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var submitBtn = document.getElementById("submitInvoiceBtn");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Creating..."; }
+      if (createInvoiceError) createInvoiceError.style.display = "none";
+
+      var payload = {
+        customer_id: parseInt(invoiceCustSelect.value, 10),
+        description: (document.getElementById("invoiceDesc").value || "").trim(),
+        amount: parseFloat(document.getElementById("invoiceAmount").value) || 0,
+        due_date: document.getElementById("invoiceDueDate").value || null,
+      };
+
+      apiPost("/api/admin/invoices", payload)
+        .then(function (inv) {
+          closeInvoiceModal();
+          alert("Invoice " + (inv.invoice_number || "") + " created for $" + payload.amount.toFixed(2) + ". Customer will see it in their portal.");
+          // Reload the detail panel if open
+          if (currentDetailCustomerId) {
+            var cust = allCustomers.find(function (c) { return c.id === currentDetailCustomerId; });
+            if (cust) {
+              api("/api/admin/customers/" + currentDetailCustomerId)
+                .then(function (detail) { openAccountDetail(detail); })
+                .catch(function () {});
+            }
+          }
+        })
+        .catch(function (err) {
+          if (createInvoiceError) {
+            createInvoiceError.textContent = "Failed to create invoice. " + (err.message || "");
+            createInvoiceError.style.display = "block";
+          }
+        })
+        .finally(function () {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Create & Send"; }
+        });
+    });
+  }
+
   /* ===== QUOTE CALCULATOR (unchanged — all local) ===== */
   var packagePricing = {
     kitchen: { name: "Kitchen Guard", subtitle: "Waterdrop G5P500A — 500 GPD", base: 699, max: 849 },
@@ -928,9 +1026,7 @@
   var payDepositBtn = document.getElementById("payDepositBtn");
   var stripeModalClose = document.getElementById("stripeModalClose");
   var modalPayBtn = document.getElementById("modalPayBtn");
-  var modalSuccess = document.getElementById("modalSuccess");
   var stripeForm = document.getElementById("stripeForm");
-  var modalSuccessClose = document.getElementById("modalSuccessClose");
   var shareQuoteBtn = document.getElementById("shareQuoteBtn");
 
   function openStripeModal() {
@@ -961,10 +1057,11 @@
 
     var deposit = Math.ceil(currentQuoteTotal / 2);
     if (modalDeposit) modalDeposit.textContent = "$" + deposit.toLocaleString();
-    if (modalPayBtn) modalPayBtn.textContent = "Pay $" + deposit.toLocaleString() + ".00";
+    if (modalPayBtn) modalPayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:6px;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pay $' + deposit.toLocaleString() + ' via Stripe';
 
     if (stripeForm) stripeForm.style.display = "block";
-    if (modalSuccess) modalSuccess.style.display = "none";
+    var errEl = document.getElementById("stripeCheckoutError");
+    if (errEl) errEl.style.display = "none";
     stripeModal.classList.add("active");
   }
 
@@ -974,7 +1071,6 @@
 
   if (payDepositBtn) payDepositBtn.addEventListener("click", openStripeModal);
   if (stripeModalClose) stripeModalClose.addEventListener("click", closeStripeModal);
-  if (modalSuccessClose) modalSuccessClose.addEventListener("click", closeStripeModal);
   if (stripeModal) {
     stripeModal.addEventListener("click", function (e) {
       if (e.target === stripeModal) closeStripeModal();
@@ -982,13 +1078,49 @@
   }
   if (modalPayBtn) {
     modalPayBtn.addEventListener("click", function () {
-      modalPayBtn.textContent = "Processing...";
+      var selectedRadio = document.querySelector('input[name="package"]:checked');
+      var selectedPkg = selectedRadio ? selectedRadio.value : "kitchen";
+      var wantWarranty = document.getElementById("addonWarranty") ? document.getElementById("addonWarranty").checked : false;
+      var wantFilter = document.getElementById("addonFilter") ? document.getElementById("addonFilter").checked : false;
+      var wantRush = document.getElementById("addonRush") ? document.getElementById("addonRush").checked : false;
+      var addons = [];
+      if (wantWarranty) addons.push("warranty");
+      if (wantFilter) addons.push("filter");
+      if (wantRush) addons.push("rush");
+      var emailField = document.getElementById("checkoutEmail");
+      var custEmail = emailField ? emailField.value.trim() : "";
+      var errEl = document.getElementById("stripeCheckoutError");
+
+      modalPayBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Redirecting to Stripe...</span>';
       modalPayBtn.disabled = true;
-      setTimeout(function () {
-        if (stripeForm) stripeForm.style.display = "none";
-        if (modalSuccess) modalSuccess.style.display = "block";
-        modalPayBtn.disabled = false;
-      }, 1500);
+
+      var payload = {
+        package: selectedPkg,
+        total_amount: currentQuoteTotal,
+        customer_email: custEmail || null,
+        addons: addons,
+      };
+
+      apiPost("/api/stripe/create-checkout-session", payload)
+        .then(function (data) {
+          if (data.checkout_url) {
+            window.open(data.checkout_url, "_blank");
+            closeStripeModal();
+          } else {
+            throw new Error("No checkout URL returned");
+          }
+        })
+        .catch(function (err) {
+          if (errEl) {
+            errEl.textContent = "Failed to create checkout session. " + (err.message || "Please try again.");
+            errEl.style.display = "block";
+          }
+        })
+        .finally(function () {
+          var deposit = Math.ceil(currentQuoteTotal / 2);
+          modalPayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:6px;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pay $' + deposit.toLocaleString() + ' via Stripe';
+          modalPayBtn.disabled = false;
+        });
     });
   }
   if (shareQuoteBtn) {
@@ -1102,10 +1234,252 @@
     }
   }, 60000);
 
+  /* ===== LEADS TABLE (DYNAMIC) ===== */
+  var allLeads = [];
+
+  function loadLeadsTable() {
+    api("/api/leads?limit=20")
+      .then(function (leads) {
+        allLeads = leads || [];
+        renderLeadsTable(allLeads);
+      })
+      .catch(function () {
+        var tbody = document.getElementById("leadsTableBody");
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">No leads found</td></tr>';
+      });
+  }
+
+  function leadStatusClass(status) {
+    var s = (status || "").toLowerCase();
+    if (s === "qualified") return "badge-qualified";
+    if (s === "contacted") return "badge-contacted";
+    if (s === "quoted") return "badge-quoted";
+    if (s === "won") return "badge-won";
+    if (s === "lost") return "badge-cancelled";
+    return "badge-new";
+  }
+
+  function renderLeadsTable(leads) {
+    var tbody = document.getElementById("leadsTableBody");
+    if (!tbody) return;
+    if (!leads || leads.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">No leads yet</td></tr>';
+      return;
+    }
+    var html = "";
+    leads.forEach(function (l) {
+      var d = l.created_at ? new Date(l.created_at) : null;
+      var dateStr = d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "--";
+      var status = l.status || "new";
+      html += '<tr data-lead-id="' + l.id + '">' +
+        '<td>' + (l.name || "--") + '</td>' +
+        '<td>' + (l.package_interest || "--") + '</td>' +
+        '<td>' + (l.zip || "--") + '</td>' +
+        '<td>' + (l.source || "--") + '</td>' +
+        '<td><span class="badge ' + leadStatusClass(status) + '">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span></td>' +
+        '<td>' + (l.quoted_price ? "$" + Number(l.quoted_price).toLocaleString() : "--") + '</td>' +
+        '<td>' + dateStr + '</td>' +
+        '<td><button class="view-row-btn delete-lead-btn" title="Delete lead" data-lid="' + l.id + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>' +
+        '</button></td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+
+    tbody.querySelectorAll(".delete-lead-btn").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var lid = btn.dataset.lid;
+        if (confirm("Delete this lead?")) {
+          deleteLead(lid);
+        }
+      });
+    });
+  }
+
+  function deleteLead(leadId) {
+    fetch(API_BASE + "/api/leads/" + leadId, { method: "DELETE" })
+      .then(function (r) {
+        if (!r.ok && r.status !== 204) throw new Error("Delete failed");
+        loadLeadsTable();
+        dashboardLoaded = false;
+        loadDashboard();
+      })
+      .catch(function () { alert("Failed to delete lead."); });
+  }
+
+  function deleteAllLeads() {
+    if (!confirm("Are you sure you want to delete ALL leads? This cannot be undone.")) return;
+    if (!allLeads || allLeads.length === 0) { alert("No leads to delete."); return; }
+    var promises = allLeads.map(function (l) {
+      return fetch(API_BASE + "/api/leads/" + l.id, { method: "DELETE" });
+    });
+    Promise.all(promises)
+      .then(function () {
+        allLeads = [];
+        renderLeadsTable([]);
+        dashboardLoaded = false;
+        loadDashboard();
+      })
+      .catch(function () { alert("Some leads could not be deleted."); loadLeadsTable(); });
+  }
+
+  var deleteAllBtn = document.getElementById("deleteAllLeadsBtn");
+  if (deleteAllBtn) deleteAllBtn.addEventListener("click", deleteAllLeads);
+
+  var settingsDeleteAllBtn = document.getElementById("settingsDeleteAllLeads");
+  if (settingsDeleteAllBtn) settingsDeleteAllBtn.addEventListener("click", deleteAllLeads);
+
+  /* ===== EMAIL CAMPAIGNS ===== */
+  function loadEmailSequences() {
+    var container = document.getElementById("emailSequencesList");
+    if (!container) return;
+    container.innerHTML = '<div class="accounts-empty" style="padding:var(--space-10) var(--space-4);"><div style="color:var(--color-text-muted);">Loading...</div></div>';
+
+    api("/api/email/automation/sequences")
+      .then(function (sequences) {
+        if (!sequences || sequences.length === 0) {
+          container.innerHTML = '<div class="accounts-empty" style="padding:var(--space-10) var(--space-4);">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;color:var(--color-text-faint);">' +
+            '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>' +
+            '<div style="color:var(--color-text-muted);margin-top:var(--space-3);">No active email sequences</div>' +
+            '<div style="color:var(--color-text-faint);font-size:var(--text-xs);margin-top:var(--space-2);">Sequences are auto-created when new leads come in via Google Ads, Intercom, or the website chat.</div>' +
+          '</div>';
+          return;
+        }
+        var html = '';
+        sequences.forEach(function (seq) {
+          var created = seq.created_at ? new Date(seq.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "--";
+          var statusClass = seq.active ? "badge-completed" : "badge-pending";
+          var statusText = seq.active ? "Active" : "Completed";
+          html += '<div class="sequence-card">' +
+            '<div class="sequence-card-header">' +
+              '<div class="sequence-card-icon email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>' +
+              '<div class="sequence-card-info">' +
+                '<div class="sequence-card-title">' + (seq.sequence_type || seq.type || "Welcome Sequence") + '</div>' +
+                '<div class="sequence-card-sub">Lead #' + (seq.lead_id || "--") + ' &middot; Started ' + created + '</div>' +
+              '</div>' +
+              '<span class="badge ' + statusClass + '">' + statusText + '</span>' +
+            '</div>' +
+            '<div class="sequence-card-body">' +
+              '<div class="profile-info-row"><span class="profile-info-label">Current Step</span><span class="profile-info-value">' + (seq.current_step || 0) + ' / ' + (seq.total_steps || "--") + '</span></div>' +
+              (seq.next_send_at ? '<div class="profile-info-row"><span class="profile-info-label">Next Send</span><span class="profile-info-value">' + new Date(seq.next_send_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + '</span></div>' : '') +
+            '</div>' +
+            (seq.active ? '<div class="sequence-card-footer"><button class="btn" style="background:var(--color-error);color:#fff;font-size:var(--text-xs);" onclick="window._cancelEmailSeq(' + seq.id + ')">Cancel Sequence</button></div>' : '') +
+          '</div>';
+        });
+        container.innerHTML = html;
+      })
+      .catch(function () {
+        container.innerHTML = '<div class="accounts-empty" style="padding:var(--space-10) var(--space-4);">' +
+          '<div style="color:var(--color-text-muted);">No active email sequences</div>' +
+          '<div style="color:var(--color-text-faint);font-size:var(--text-xs);margin-top:var(--space-2);">Sequences are auto-created when new leads come in.</div></div>';
+      });
+  }
+
+  window._cancelEmailSeq = function (seqId) {
+    if (!confirm("Cancel this email sequence?")) return;
+    fetch(API_BASE + "/api/email/automation/cancel/" + seqId, { method: "DELETE" })
+      .then(function () { loadEmailSequences(); })
+      .catch(function () { alert("Failed to cancel sequence."); });
+  };
+
+  var refreshEmailBtn = document.getElementById("refreshEmailBtn");
+  if (refreshEmailBtn) refreshEmailBtn.addEventListener("click", loadEmailSequences);
+
+  /* ===== SMS DRIPS ===== */
+  function loadSmsSequences() {
+    var container = document.getElementById("smsSequencesList");
+    if (!container) return;
+    container.innerHTML = '<div class="accounts-empty" style="padding:var(--space-10) var(--space-4);"><div style="color:var(--color-text-muted);">Loading...</div></div>';
+
+    api("/api/sms/sequences")
+      .then(function (sequences) {
+        if (!sequences || sequences.length === 0) {
+          container.innerHTML = '<div class="accounts-empty" style="padding:var(--space-10) var(--space-4);">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;color:var(--color-text-faint);">' +
+            '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>' +
+            '<div style="color:var(--color-text-muted);margin-top:var(--space-3);">No active SMS drip sequences</div>' +
+            '<div style="color:var(--color-text-faint);font-size:var(--text-xs);margin-top:var(--space-2);">SMS drips auto-enroll when leads provide a phone number.</div>' +
+          '</div>';
+          return;
+        }
+        var html = '';
+        sequences.forEach(function (seq) {
+          var created = seq.created_at ? new Date(seq.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "--";
+          var statusClass = seq.active ? "badge-completed" : "badge-pending";
+          var statusText = seq.active ? "Active" : "Completed";
+          html += '<div class="sequence-card">' +
+            '<div class="sequence-card-header">' +
+              '<div class="sequence-card-icon sms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>' +
+              '<div class="sequence-card-info">' +
+                '<div class="sequence-card-title">' + (seq.sequence_type || "Follow-Up Drip") + '</div>' +
+                '<div class="sequence-card-sub">Lead #' + (seq.lead_id || "--") + ' &middot; ' + (seq.phone || "") + ' &middot; Started ' + created + '</div>' +
+              '</div>' +
+              '<span class="badge ' + statusClass + '">' + statusText + '</span>' +
+            '</div>' +
+            '<div class="sequence-card-body">' +
+              '<div class="profile-info-row"><span class="profile-info-label">Current Step</span><span class="profile-info-value">' + (seq.current_step || 0) + ' / ' + (seq.total_steps || "--") + '</span></div>' +
+              (seq.next_send_at ? '<div class="profile-info-row"><span class="profile-info-label">Next Send</span><span class="profile-info-value">' + new Date(seq.next_send_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + '</span></div>' : '') +
+            '</div>' +
+            (seq.active ? '<div class="sequence-card-footer"><button class="btn" style="background:var(--color-error);color:#fff;font-size:var(--text-xs);" onclick="window._optOutSms(' + seq.id + ')">Opt Out</button></div>' : '') +
+          '</div>';
+        });
+        container.innerHTML = html;
+      })
+      .catch(function () {
+        container.innerHTML = '<div class="accounts-empty" style="padding:var(--space-10) var(--space-4);">' +
+          '<div style="color:var(--color-text-muted);">No active SMS sequences</div>' +
+          '<div style="color:var(--color-text-faint);font-size:var(--text-xs);margin-top:var(--space-2);">SMS drips auto-enroll when leads provide a phone number.</div></div>';
+      });
+  }
+
+  window._optOutSms = function (seqId) {
+    if (!confirm("Opt out of this SMS sequence?")) return;
+    fetch(API_BASE + "/api/sms/opt-out/" + seqId, { method: "POST" })
+      .then(function () { loadSmsSequences(); })
+      .catch(function () { alert("Failed to opt out."); });
+  };
+
+  var refreshSmsBtn = document.getElementById("refreshSmsBtn");
+  if (refreshSmsBtn) refreshSmsBtn.addEventListener("click", loadSmsSequences);
+
+  /* ===== SETTINGS — HEALTH CHECK ===== */
+  function checkSystemHealth() {
+    var apiDot = document.getElementById("healthDotApi");
+    var apiStatus = document.getElementById("healthApiStatus");
+    var dbDot = document.getElementById("healthDotDb");
+    var dbStatus = document.getElementById("healthDbStatus");
+
+    fetch(API_BASE + "/api/health")
+      .then(function (r) {
+        if (r.ok) return r.json();
+        throw new Error("down");
+      })
+      .then(function (data) {
+        if (apiDot) apiDot.classList.add("connected");
+        if (apiStatus) apiStatus.textContent = "Online";
+        if (data.database === "connected" || data.db === "ok") {
+          if (dbDot) dbDot.classList.add("connected");
+          if (dbStatus) dbStatus.textContent = "Connected";
+        } else {
+          if (dbDot) { dbDot.classList.remove("connected"); dbDot.classList.add("disconnected"); }
+          if (dbStatus) dbStatus.textContent = "Issue detected";
+        }
+      })
+      .catch(function () {
+        if (apiDot) { apiDot.classList.remove("connected"); apiDot.classList.add("disconnected"); }
+        if (apiStatus) apiStatus.textContent = "Offline";
+        if (dbDot) { dbDot.classList.remove("connected"); dbDot.classList.add("disconnected"); }
+        if (dbStatus) dbStatus.textContent = "Unreachable";
+      });
+  }
+
   /* ===== INITIAL LOAD ===== */
   if (!window.location.hash || window.location.hash === "#dashboard") {
     dashboardLoaded = true;
     loadDashboard();
+    loadLeadsTable();
   }
 })();
 /* deploy trigger 1773126053 */
