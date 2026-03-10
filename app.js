@@ -62,6 +62,7 @@
     if (viewId === "dispatch" && !dispatchMapInitialized) {
       dispatchMapInitialized = true;
       setTimeout(initDispatchMap, 100);
+      loadDispatchData();
     }
     if (viewId === "portal") {
       loadPortalCustomers();
@@ -651,12 +652,17 @@
     // Populate invoices
     var invoicesEl = document.getElementById("detailInvoicesContent");
     if (cust.invoices && cust.invoices.length > 0) {
-      var ihtml = '<table class="data-table" style="font-size:var(--text-xs);"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>';
+      var ihtml = '<table class="data-table" style="font-size:var(--text-xs);"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
       cust.invoices.forEach(function (inv) {
+        var isPaid = inv.status === "paid";
         ihtml += '<tr><td>' + formatDate(inv.date || inv.created_at) + '</td>' +
           '<td>' + (inv.description || "--") + '</td>' +
           '<td>$' + (inv.amount || "0") + '</td>' +
-          '<td><span class="badge ' + (inv.status === "paid" ? 'badge-completed' : 'badge-pending') + '">' + (inv.status || "Pending") + '</span></td></tr>';
+          '<td><span class="badge ' + (isPaid ? 'badge-completed' : 'badge-pending') + '">' + (inv.status || "Pending") + '</span></td>' +
+          '<td>' + (isPaid ? '<span style="color:var(--color-text-faint);">--</span>'
+            : '<button class="btn" style="font-size:var(--text-xs);padding:2px 8px;background:var(--color-success);color:#fff;margin-right:4px;" onclick="window._markInvoicePaid(' + inv.id + ',this)">Mark Paid</button>' +
+              '<button class="btn" style="font-size:var(--text-xs);padding:2px 8px;background:var(--color-warning);color:#000;" onclick="window._sendInvoiceReminder(' + inv.id + ',this)">Remind</button>'
+          ) + '</td></tr>';
       });
       ihtml += '</tbody></table>';
       invoicesEl.innerHTML = ihtml;
@@ -931,6 +937,39 @@
   });
 
   /* ===== DISPATCH MAP (LEAFLET) — pulls from API ===== */
+  function loadDispatchData() {
+    api("/api/admin/dispatch")
+      .then(function (data) {
+        var stats = data.stats || {};
+        var jobs = data.jobs || [];
+
+        /* Update stats */
+        var totalEl = document.getElementById("dispatchTotalJobs");
+        var urgentEl = document.getElementById("dispatchUrgent");
+        var apptsEl = document.getElementById("dispatchAppts");
+        if (totalEl) totalEl.textContent = stats.total_open || 0;
+        if (urgentEl) urgentEl.textContent = stats.urgent || 0;
+        if (apptsEl) apptsEl.textContent = stats.appointments || 0;
+
+        /* Update calendar time slots with real jobs */
+        var timeSlots = document.querySelectorAll(".time-slot");
+        timeSlots.forEach(function (slot) { slot.innerHTML = ""; });
+
+        jobs.forEach(function (job, idx) {
+          if (idx >= timeSlots.length) return;
+          var colorClass = job.priority === "urgent" ? "pink" : (job.type === "warranty_claim" ? "violet" : "cyan");
+          var html = '<div class="job-block ' + colorClass + '">' +
+            '<div class="job-block-title">' + (job.category || job.type) + ' — ' + (job.customer_name || "Unassigned") + '</div>' +
+            '<div class="job-block-detail">' + (job.customer_address || "No address") +
+            (job.assigned_tech ? ' — ' + job.assigned_tech : '') + '</div></div>';
+          timeSlots[idx].innerHTML = html;
+        });
+      })
+      .catch(function (err) {
+        console.error("Dispatch data load failed:", err);
+      });
+  }
+
   function initDispatchMap() {
     var mapContainer = document.getElementById("dispatchMap");
     if (!mapContainer || typeof L === "undefined") return;
@@ -1059,11 +1098,11 @@
     if (stripeForm) stripeForm.style.display = "block";
     var errEl = document.getElementById("stripeCheckoutError");
     if (errEl) errEl.style.display = "none";
-    stripeModal.classList.add("active");
+    stripeModal.classList.add("open");
   }
 
   function closeStripeModal() {
-    if (stripeModal) stripeModal.classList.remove("active");
+    if (stripeModal) stripeModal.classList.remove("open");
   }
 
   if (payDepositBtn) payDepositBtn.addEventListener("click", openStripeModal);
@@ -1714,13 +1753,13 @@
 
   function openNewWarrantyModal() {
     if (!newWcModal) return;
-    newWcModal.classList.add("active");
+    newWcModal.classList.add("open");
     populateCustomerDropdown("wcCustSelect");
   }
 
   function closeNewWarrantyModal() {
     if (!newWcModal) return;
-    newWcModal.classList.remove("active");
+    newWcModal.classList.remove("open");
     if (newWcForm) newWcForm.reset();
     var errEl = document.getElementById("newWarrantyError");
     if (errEl) errEl.style.display = "none";
@@ -1802,7 +1841,7 @@
 
   function openEmailBotModal() {
     if (!ebModal) return;
-    ebModal.classList.add("active");
+    ebModal.classList.add("open");
     if (ebPreview) ebPreview.style.display = "none";
     if (ebFooter) ebFooter.style.display = "none";
     currentGeneratedEmail = null;
@@ -1811,7 +1850,7 @@
 
   function closeEmailBotModal() {
     if (!ebModal) return;
-    ebModal.classList.remove("active");
+    ebModal.classList.remove("open");
     if (ebPreview) ebPreview.style.display = "none";
     if (ebFooter) ebFooter.style.display = "none";
     currentGeneratedEmail = null;
@@ -1964,6 +2003,53 @@
   if (ebFromCampaignsBtn) {
     ebFromCampaignsBtn.addEventListener("click", openEmailBotModal);
   }
+
+  /* ===== INVOICE MANAGEMENT — Mark Paid / Send Reminder ===== */
+  window._markInvoicePaid = function (invoiceId, btnEl) {
+    if (!confirm("Mark this invoice as paid?")) return;
+    btnEl.textContent = "...";
+    btnEl.disabled = true;
+    fetch(API_BASE + "/api/admin/invoices/" + invoiceId + "/mark-paid", { method: "PUT" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("Failed");
+        return r.json();
+      })
+      .then(function () {
+        btnEl.textContent = "Paid";
+        btnEl.style.background = "var(--color-text-faint)";
+        /* Update the badge in the same row */
+        var row = btnEl.closest("tr");
+        if (row) {
+          var badge = row.querySelector(".badge");
+          if (badge) { badge.className = "badge badge-completed"; badge.textContent = "paid"; }
+        }
+      })
+      .catch(function () {
+        btnEl.textContent = "Mark Paid";
+        btnEl.disabled = false;
+        alert("Failed to mark invoice as paid.");
+      });
+  };
+
+  window._sendInvoiceReminder = function (invoiceId, btnEl) {
+    btnEl.textContent = "Sending...";
+    btnEl.disabled = true;
+    apiPost("/api/admin/invoices/" + invoiceId + "/send-reminder", {})
+      .then(function (data) {
+        btnEl.textContent = "Sent";
+        btnEl.style.background = "var(--color-text-faint)";
+        setTimeout(function () {
+          btnEl.textContent = "Remind";
+          btnEl.style.background = "var(--color-warning)";
+          btnEl.disabled = false;
+        }, 3000);
+      })
+      .catch(function () {
+        btnEl.textContent = "Remind";
+        btnEl.disabled = false;
+        alert("Failed to send reminder.");
+      });
+  };
 
   /* ===== INITIAL LOAD ===== */
   if (!window.location.hash || window.location.hash === "#dashboard") {

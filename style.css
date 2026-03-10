@@ -1077,24 +1077,7 @@ html, body { height: 100%; overflow: hidden; margin: 0; }
   background: #0D0B1E !important;
 }
 
-/* ===== STRIPE CHECKOUT MODAL ===== */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-overlay.active {
-  display: flex;
-}
+/* Stale modal CSS removed — canonical .modal-overlay definition is below (uses .open) */
 
 .modal-card {
   background: var(--color-surface);
