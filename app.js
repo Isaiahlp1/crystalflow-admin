@@ -1030,23 +1030,7 @@
   }
 
   function addDemoMapMarkers(map) {
-    var jobs = [
-      { name: "Kitchen Guard", lat: 25.778, lng: -80.215, color: "#00C9DB" },
-      { name: "Water Test", lat: 25.795, lng: -80.128, color: "#5B6BF5" },
-      { name: "Home Shield", lat: 25.782, lng: -80.188, color: "#E8439A" },
-      { name: "Filter Change", lat: 25.762, lng: -80.192, color: "#34D399" },
-      { name: "Pure Life", lat: 25.752, lng: -80.248, color: "#00C9DB" },
-    ];
-    jobs.forEach(function (job) {
-      var icon = L.divIcon({
-        className: "custom-job-marker",
-        html: '<div style="width:14px;height:14px;background:' + job.color + ';border:2px solid #fff;border-radius:3px;box-shadow:0 0 8px ' + job.color + ';"></div>',
-        iconSize: [14, 14],
-        iconAnchor: [7, 7],
-      });
-      L.marker([job.lat, job.lng], { icon: icon }).addTo(map)
-        .bindPopup('<div class="popup-title">' + job.name + '</div>');
-    });
+    /* No demo markers — real data only */
   }
 
   /* ===== STRIPE CHECKOUT MODAL ===== */
@@ -1618,6 +1602,24 @@
     return status.replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
   }
 
+  function populateWarrantyTechDropdown(select, currentValue) {
+    select.innerHTML = '<option value="">Unassigned</option>';
+    fetch(API_BASE + '/admin/technicians/')
+      .then(function(r) { return r.json(); })
+      .then(function(techs) {
+        techs.forEach(function(t) {
+          if (!t.is_active) return;
+          var name = t.first_name + ' ' + t.last_name;
+          var opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          select.appendChild(opt);
+        });
+        select.value = currentValue;
+      })
+      .catch(function() {});
+  }
+
   function openWarrantyDetail(claimId) {
     var claim = allWarrantyClaims.find(function (c) { return c.id === claimId; });
     if (!claim) return;
@@ -1637,7 +1639,9 @@
     if (statusSelect) statusSelect.value = claim.status || "submitted";
 
     var techSelect = document.getElementById("wcUpdateTech");
-    if (techSelect) techSelect.value = claim.assigned_tech || "";
+    if (techSelect) {
+      populateWarrantyTechDropdown(techSelect, claim.assigned_tech || "");
+    }
 
     var notesField = document.getElementById("wcUpdateNotes");
     if (notesField) notesField.value = claim.resolution_notes || "";
@@ -2108,6 +2112,11 @@
           container.innerHTML = '<div style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">No technicians. Add them in Team Management.</div>';
           return;
         }
+        var activeTechs = techs.filter(function(t) { return t.is_active; });
+        var onlineCount = activeTechs.length;
+        var countEl = document.getElementById('techsOnlineCount');
+        if (countEl) countEl.textContent = onlineCount;
+
         var colors = ['#E8439A','#00C9DB','#5B6BF5','#34D399','#FBBF24','#F97316'];
         var html = '';
         techs.forEach(function(t, i) {

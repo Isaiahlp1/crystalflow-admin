@@ -224,35 +224,13 @@
       <!-- ====== APPOINTMENTS ====== -->
       <div class="portal-view" id="tab-appointments">
         <div class="section-title">Upcoming</div>
-        <div class="appt-card">
-          <div class="appt-date-box cyan">
-            <span class="month">AUG</span>
-            <span class="day">14</span>
-          </div>
-          <div class="appt-info">
-            <div class="appt-title">Filter Change</div>
-            <div class="appt-meta">Aug 14, 2026, 2:00 PM &mdash; Technician: Ana T.</div>
-            <div class="appt-actions">
-              <span class="badge badge-scheduled">Scheduled</span>
-              <button class="btn btn-secondary btn-sm" onclick="alert('Reschedule feature coming soon!')">Reschedule</button>
-            </div>
-          </div>
+        <div id="portal-upcoming-appts" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">
+          No upcoming appointments.
         </div>
 
         <div class="section-title" style="margin-top: var(--space-8);">Past Appointments</div>
-        <div class="appt-card">
-          <div class="appt-date-box green">
-            <span class="month">FEB</span>
-            <span class="day">14</span>
-          </div>
-          <div class="appt-info">
-            <div class="appt-title">Initial Installation</div>
-            <div class="appt-meta">Feb 14, 2026, 10:00 AM &mdash; Technician: Marco R.</div>
-            <div class="appt-actions">
-              <span class="badge badge-completed">Completed</span>
-              <span class="star-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            </div>
-          </div>
+        <div id="portal-past-appts" style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">
+          No past appointments yet.
         </div>
 
         <button class="btn btn-primary" style="margin-top: var(--space-6);" onclick="alert('Appointment scheduling coming soon!')">Request New Appointment</button>
