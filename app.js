@@ -22,6 +22,7 @@
     email: "Email Campaigns",
     sms: "SMS Drips",
     settings: "Settings",
+    team: "Team Management",
   };
 
   var ctaLabels = {
@@ -34,8 +35,10 @@
     email: "Compose Email",
     sms: "Compose Email",
     settings: "",
+    team: "+ Add Technician",
   };
 
+  var teamLoaded = false;
   var dispatchMapInitialized = false;
   var dashboardLoaded = false;
   var revenueChartInstance = null;
@@ -78,6 +81,10 @@
     }
     if (viewId === "settings") {
       checkSystemHealth();
+    }
+    if (viewId === "team" && !teamLoaded) {
+      teamLoaded = true;
+      loadTeam();
     }
   }
 
@@ -1018,23 +1025,8 @@
         addDemoMapMarkers(map);
       });
 
-    /* Always show tech markers */
-    var techs = [
-      { name: "Marco R.", status: "Available", lat: 25.776, lng: -80.212 },
-      { name: "Ana T.", status: "Available", lat: 25.790, lng: -80.140 },
-      { name: "Luis G.", status: "At Base", lat: 25.770, lng: -80.200 },
-    ];
-    techs.forEach(function (tech) {
-      var icon = L.divIcon({
-        className: "custom-tech-marker",
-        html: '<div style="width:12px;height:12px;background:#FBBF24;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px #FBBF24;"></div>',
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
-      });
-      L.marker([tech.lat, tech.lng], { icon: icon })
-        .addTo(map)
-        .bindPopup('<div class="popup-title">' + tech.name + '</div><div class="popup-detail">' + tech.status + '</div>');
-    });
+    /* Load real technicians for dispatch */
+    loadDispatchTechs();
   }
 
   function addDemoMapMarkers(map) {
@@ -2050,6 +2042,195 @@
         alert("Failed to send reminder.");
       });
   };
+
+  /* ===== TEAM MANAGEMENT ===== */
+
+  var _teamData = [];
+
+  function loadTeam() {
+    fetch(API_BASE + '/admin/technicians/')
+      .then(function(r) { return r.json(); })
+      .then(function(techs) {
+        _teamData = techs;
+        renderTeamGrid(techs);
+        var badge = document.getElementById('teamBadge');
+        if (badge) badge.textContent = techs.filter(function(t) { return t.is_active; }).length;
+      })
+      .catch(function() {
+        document.getElementById('teamGrid').innerHTML = '<div style="text-align:center;color:var(--color-text-faint);padding:var(--space-8);">Failed to load team data.</div>';
+      });
+  }
+
+  function renderTeamGrid(techs) {
+    var grid = document.getElementById('teamGrid');
+    if (!techs || techs.length === 0) {
+      grid.innerHTML = '<div style="text-align:center;color:var(--color-text-faint);padding:var(--space-8);">No technicians yet. Click "Add Technician" to get started.</div>';
+      return;
+    }
+    var html = '';
+    var colors = ['#E8439A','#00C9DB','#5B6BF5','#34D399','#FBBF24','#F97316'];
+    techs.forEach(function(t, i) {
+      if (!t.is_active) return;
+      var initials = (t.first_name[0] || '') + (t.last_name[0] || '');
+      var col = colors[i % colors.length];
+      var statusClass = t.status || 'available';
+      var statusLabel = (t.status || 'available').replace('_', ' ');
+      html += '<div class="team-card" data-tech-id="' + t.id + '">' +
+        '<div class="team-card-top">' +
+          '<div class="team-card-avatar" style="background:' + col + ';">' + initials + '</div>' +
+          '<div class="team-card-info"><div class="team-card-name">' + t.first_name + ' ' + t.last_name + '</div><div class="team-card-role">' + (t.role || 'Installer') + '</div></div>' +
+          '<span class="team-card-status ' + statusClass + '">' + statusLabel + '</span>' +
+        '</div>' +
+        '<div class="team-card-details">' +
+          '<div class="team-card-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>' + (t.email || '--') + '</div>' +
+          '<div class="team-card-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>' + (t.phone || '--') + '</div>' +
+        '</div>' +
+        '<div class="team-card-stats">' +
+          '<div class="team-card-stat"><div class="team-card-stat-value">' + (t.total_installs || 0) + '</div><div class="team-card-stat-label">Installs</div></div>' +
+          '<div class="team-card-stat"><div class="team-card-stat-value">' + (t.rating || '5.0') + '</div><div class="team-card-stat-label">Rating</div></div>' +
+        '</div>' +
+        '<div class="team-card-actions">' +
+          '<button class="btn btn-ghost" onclick="openEditTech(' + t.id + ')">Edit</button>' +
+          '<button class="btn btn-ghost" onclick="openResetPassword(' + t.id + ')">Reset Password</button>' +
+          '<button class="btn btn-danger" onclick="deactivateTech(' + t.id + ')">Remove</button>' +
+        '</div>' +
+      '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function loadDispatchTechs() {
+    var container = document.getElementById('dispatch-techs');
+    fetch(API_BASE + '/admin/technicians/')
+      .then(function(r) { return r.json(); })
+      .then(function(techs) {
+        if (!techs || techs.length === 0) {
+          container.innerHTML = '<div style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">No technicians. Add them in Team Management.</div>';
+          return;
+        }
+        var colors = ['#E8439A','#00C9DB','#5B6BF5','#34D399','#FBBF24','#F97316'];
+        var html = '';
+        techs.forEach(function(t, i) {
+          if (!t.is_active) return;
+          var initials = (t.first_name[0] || '') + (t.last_name[0] || '');
+          var col = colors[i % colors.length];
+          var statusClass = t.status || 'available';
+          var statusLabel = (t.status || 'available').replace('_', ' ');
+          html += '<div class="tech-card">' +
+            '<div class="tech-card-header">' +
+              '<div class="profile-avatar" style="background:' + col + ';">' + initials + '</div>' +
+              '<div><div class="tech-name">' + t.first_name + ' ' + t.last_name + '</div><div class="tech-role">' + (t.role || 'Installer') + '</div></div>' +
+              '<span class="tech-status ' + statusClass + '">' + statusLabel + '</span>' +
+            '</div>' +
+            '<div class="tech-stats">' +
+              '<div class="tech-stat"><div class="tech-stat-value">' + (t.total_installs || 0) + '</div><div class="tech-stat-label">Installs</div></div>' +
+              '<div class="tech-stat"><div class="tech-stat-value">' + (t.rating || '5.0') + '</div><div class="tech-stat-label">Rating</div></div>' +
+            '</div>' +
+          '</div>';
+        });
+        container.innerHTML = html;
+      })
+      .catch(function() {
+        container.innerHTML = '<div style="text-align:center;color:var(--color-text-faint);padding:var(--space-6);">Could not load technicians.</div>';
+      });
+  }
+
+  /* Modal helpers */
+  function openTechModal(editId) {
+    document.getElementById('techModal').style.display = 'block';
+    document.getElementById('techModalOverlay').classList.add('active');
+    document.getElementById('techFormAlert').style.display = 'none';
+    if (editId) {
+      document.getElementById('techModalTitle').textContent = 'Edit Technician';
+      document.getElementById('techFormSubmit').textContent = 'Save Changes';
+      document.getElementById('techPasswordGroup').style.display = 'none';
+      document.getElementById('techFormId').value = editId;
+      var t = _teamData.find(function(x) { return x.id === editId; });
+      if (t) {
+        document.getElementById('techFirstName').value = t.first_name;
+        document.getElementById('techLastName').value = t.last_name;
+        document.getElementById('techEmail').value = t.email;
+        document.getElementById('techPhone').value = t.phone || '';
+        document.getElementById('techRole').value = t.role || 'Installer';
+      }
+    } else {
+      document.getElementById('techModalTitle').textContent = 'Add Technician';
+      document.getElementById('techFormSubmit').textContent = 'Add Technician';
+      document.getElementById('techPasswordGroup').style.display = 'block';
+      document.getElementById('techFormId').value = '';
+      document.getElementById('techForm').reset();
+    }
+  }
+  window.closeTechModal = function() {
+    document.getElementById('techModal').style.display = 'none';
+    document.getElementById('techModalOverlay').classList.remove('active');
+  };
+  window.openEditTech = function(id) { openTechModal(id); };
+  window.openResetPassword = function(id) {
+    var pw = prompt('Enter new password for this technician (min 6 characters):');
+    if (!pw || pw.length < 6) { alert('Password must be at least 6 characters.'); return; }
+    fetch(API_BASE + '/admin/technicians/' + id + '/reset-password', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ new_password: pw })
+    }).then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function() { alert('Password reset successfully.'); })
+      .catch(function() { alert('Failed to reset password.'); });
+  };
+  window.deactivateTech = function(id) {
+    if (!confirm('Remove this technician? They will no longer appear in the team.')) return;
+    fetch(API_BASE + '/admin/technicians/' + id, { method: 'DELETE' })
+      .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function() { teamLoaded = false; loadTeam(); })
+      .catch(function() { alert('Failed to remove technician.'); });
+  };
+
+  /* Add Tech button */
+  var addTechBtn = document.getElementById('addTechBtn');
+  if (addTechBtn) addTechBtn.addEventListener('click', function() { openTechModal(null); });
+  var closeTechModalBtn = document.getElementById('closeTechModal');
+  if (closeTechModalBtn) closeTechModalBtn.addEventListener('click', closeTechModal);
+  var techOverlay = document.getElementById('techModalOverlay');
+  if (techOverlay) techOverlay.addEventListener('click', closeTechModal);
+
+  /* Tech form submit */
+  var techForm = document.getElementById('techForm');
+  if (techForm) techForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var alertEl = document.getElementById('techFormAlert');
+    alertEl.style.display = 'none';
+    var editId = document.getElementById('techFormId').value;
+    var body = {
+      first_name: document.getElementById('techFirstName').value.trim(),
+      last_name: document.getElementById('techLastName').value.trim(),
+      email: document.getElementById('techEmail').value.trim(),
+      phone: document.getElementById('techPhone').value.trim() || null,
+      role: document.getElementById('techRole').value,
+    };
+    if (!editId) {
+      body.password = document.getElementById('techPassword').value;
+      if (!body.password || body.password.length < 6) {
+        alertEl.textContent = 'Password must be at least 6 characters.';
+        alertEl.className = 'modal-alert error';
+        alertEl.style.display = 'block';
+        return;
+      }
+    }
+    var url = editId ? API_BASE + '/admin/technicians/' + editId : API_BASE + '/admin/technicians/';
+    var method = editId ? 'PUT' : 'POST';
+    fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw d; }); return r.json(); })
+      .then(function() {
+        closeTechModal();
+        teamLoaded = false;
+        loadTeam();
+        loadDispatchTechs();
+      })
+      .catch(function(err) {
+        alertEl.textContent = (err && err.detail) ? (typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) : 'Failed to save technician.';
+        alertEl.className = 'modal-alert error';
+        alertEl.style.display = 'block';
+      });
+  });
 
   /* ===== INITIAL LOAD ===== */
   if (!window.location.hash || window.location.hash === "#dashboard") {
